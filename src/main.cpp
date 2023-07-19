@@ -1,10 +1,18 @@
 #include "main.hpp"
+#include "VAO.hpp"
+#include "camera.hpp"
+#include "shader.hpp"
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(window, true);
+	}
+
+	if (key == GLFW_KEY_O && action == GLFW_RELEASE)
+	{
+		std::cout << "pewwwwwwwwwwww\n";
 	}
 }
 
@@ -18,7 +26,7 @@ int main()
 	glfwWindowHint(GLFW_SAMPLES, 8);
 	
 	// glfw: create window
-	GLFWwindow* window = glfwCreateWindow(640, 480, "SandBox", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HIGHT, "SandBox", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -41,6 +49,11 @@ int main()
 
 	while(!glfwWindowShouldClose(window))
 	{
+		if(glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+		{
+			std::cout << "prrrrrrrrrr\n";
+		}
+
 		glClearColor(1.f, 1.f, 0.15f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glfwSwapBuffers(window);
