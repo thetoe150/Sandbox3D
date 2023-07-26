@@ -21,6 +21,7 @@ public:
 		unsigned int secondAttrLen, unsigned int thirdAttrLen,
 		unsigned int divisor1 = 0, unsigned int divisor2 = 0,
 		unsigned int divisor3 = 0)
+		: vaoID(0), eboID(0), vertexAttrCounter(0)
 	{
 		glGenVertexArrays(1, &vaoID);
 		addVBO(data, dataSize, firstAttrLen, secondAttrLen, thirdAttrLen, 
@@ -70,12 +71,12 @@ public:
     ~VAO()
     {
         std::cout << "Calling VAO destructor" <<std::endl;
-        //glDeleteVertexArrays(1, &vaoID);
-        //glDeleteBuffers(1, &eboID);
-        //for(auto vbo : vboIDs)
-        //{
-          //glDeleteBuffers(1, &vbo);
-        //}
+        glDeleteVertexArrays(1, &vaoID);
+        glDeleteBuffers(1, &eboID);
+        for(auto vbo : vboIDs)
+        {
+        //glDeleteBuffers(1, &vbo);
+        }
     }
 
     unsigned int getVAOID() const
@@ -95,7 +96,7 @@ public:
 		unsigned int vboID;
 		glGenBuffers(1, &vboID);
 		glBindBuffer(GL_ARRAY_BUFFER, vboID);
-		glBufferData(GL_ARRAY_BUFFER, dataSize, (void*)data, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, dataSize, data, GL_STATIC_DRAW);
 		this->vboIDs.push_back(vboID);
 
 		unsigned int totalAttrLen = firstAttrLen + secondAttrLen + thirdAttrLen;
@@ -104,7 +105,7 @@ public:
 		glVertexAttribPointer(vertexAttrCounter, firstAttrLen, GL_FLOAT, GL_FALSE,
 							  totalAttrLen * sizeof(float), (void*)0);
 		glVertexAttribDivisor(vertexAttrCounter, divisor1);
-		vertexAttrCounter += 1;
+		vertexAttrCounter++;
 
 		if(secondAttrLen != 0)
 		{
@@ -112,8 +113,8 @@ public:
 			glVertexAttribPointer(vertexAttrCounter, secondAttrLen, GL_FLOAT, 
 								 GL_FALSE, totalAttrLen * sizeof(float), 
 								 (void*)(firstAttrLen * sizeof(float)));
-			glVertexAttribDivisor(vertexAttrCounter, divisor1);
-			vertexAttrCounter += 1;
+			glVertexAttribDivisor(vertexAttrCounter, divisor2);
+			vertexAttrCounter++;
 		}
 
 		if(thirdAttrLen != 0)
@@ -122,9 +123,10 @@ public:
 			glVertexAttribPointer(vertexAttrCounter, thirdAttrLen, GL_FLOAT, 
 								 GL_FALSE, totalAttrLen * sizeof(float), 
 								 (void*)((firstAttrLen + secondAttrLen) * sizeof(float)));
-			glVertexAttribDivisor(vertexAttrCounter, divisor1);
-			vertexAttrCounter += 1;
+			glVertexAttribDivisor(vertexAttrCounter, divisor3);
+			vertexAttrCounter++;
 		}
+		glBindVertexArray(0);
 
 		return vertexAttrCounter - 1;
 	}

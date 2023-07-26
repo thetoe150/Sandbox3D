@@ -7,7 +7,7 @@ EXE=bin/main
 SRC_FILES=$(wildcard src/*.cpp)
 OBJ_FILES=$(patsubst src/%, obj/%, $(patsubst %.cpp, %.o ,$(SRC_FILES)))
 # INC_FILES=$(patsubst src/%, inc/%, $(patsubst %.cpp, %.hpp ,$(SRC_FILES)))
-HEADER_ONLY_FILES=inc/shader.hpp inc/camera.hpp inc/VAO.hpp inc/input.hpp
+HEADER_ONLY_FILES=inc/shader.hpp inc/camera.hpp inc/VAO.hpp inc/input.hpp inc/texture.hpp
 
 all: $(EXE)
 	./$(EXE)

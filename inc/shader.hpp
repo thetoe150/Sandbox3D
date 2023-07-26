@@ -38,7 +38,7 @@ public:
 		}
 		catch(std::ifstream::failure& e)
 		{
-			std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << std::endl;	
+			std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << std::endl;
 		}
 
 		const char* vShaderCode = vertexCode.c_str();
@@ -65,7 +65,7 @@ public:
 		}
 		catch(std::exception& e)
 		{
-			std::cerr << e.what() << "\n";	
+			std::cout << "ERROR::SHADER::COMPILE_SHADER_NOT_SUCCESSFULLY: " << e.what() << std::endl;
 		}
 
 		glDeleteShader(vShaderID);
@@ -84,6 +84,11 @@ public:
 	void use() const
 	{
 		glUseProgram(this->ID);
+	}
+
+	unsigned int getID() const
+	{
+		return this->ID;
 	}
 
 	// set uniform functions
@@ -151,9 +156,9 @@ public:
 private:
 	void checkCompileErrors(GLuint shader, std::string type, const char* Path)
 	{
-		GLint success;
+		GLint success = -1;
 		GLchar infoLog[1024];
-		if(type == "PROGRAM")
+		if(type != "PROGRAM")
 		{
 			glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 			if(!success)
@@ -174,7 +179,6 @@ private:
 				type << "\n" << infoLog << 
 				"\n ---------------------------------------------" << std::endl;
 			}
-				
 		}
 	}
 };
