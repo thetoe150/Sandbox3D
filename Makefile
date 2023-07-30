@@ -1,7 +1,6 @@
 CC=g++
-CFLAGS=-Wall -g -std=c++17 -Iinc
-LFLAGS=-Wall -g -std=c++17 -Llib -lglfw3dll
-
+CFLAGS=-Wall -g -std=c++17 -Iinc -static-libstdc++
+LFLAGS=-Wall -g -std=c++17 -Llib -lglfw3dll -static-libstdc++
 EXE=bin/main
 
 SRC_FILES=$(wildcard src/*.cpp)
@@ -25,6 +24,6 @@ obj/glad.o: src/glad.c inc/glad/glad.h
 	$(CC) -c $< -o $@ $(CFLAGS)
 
 clean: obj/ bin/
-	rm -f obj/*.o
-	rm -f bin/*
+	rm -rf obj/
+	rm -rf bin/
 

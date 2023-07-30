@@ -28,45 +28,45 @@ public:
 				divisor1, divisor2, divisor3);
 	}
 
-	VAO(const VAO& other)
-    {
-        std::cout <<"Calling VAO copy constructor."<<std::endl;
-        this->vaoID = other.vaoID;
-        this->eboID = other.eboID;
-        this->vboIDs = other.vboIDs;
-        this->vertexAttrCounter = other.vertexAttrCounter;
-    }
+	VAO(const VAO& other) = delete;
+    //{
+    //    std::cout <<"Calling VAO copy constructor."<<std::endl;
+    //    this->vaoID = other.vaoID;
+    //    this->eboID = other.eboID;
+    //    this->vboIDs = other.vboIDs;
+    //    this->vertexAttrCounter = other.vertexAttrCounter;
+    //}
 
-    VAO& operator=(const VAO& other)
-    {
-        std::cout <<"Calling VAO copy assignment."<<std::endl;
-        this->vaoID = other.vaoID;
-        this->eboID = other.eboID;
-        this->vboIDs = other.vboIDs;
-        this->vertexAttrCounter = other.vertexAttrCounter;
+    VAO& operator=(const VAO& other) = delete;
+    //{
+    //    std::cout <<"Calling VAO copy assignment."<<std::endl;
+    //    this->vaoID = other.vaoID;
+    //    this->eboID = other.eboID;
+    //    this->vboIDs = other.vboIDs;
+    //    this->vertexAttrCounter = other.vertexAttrCounter;
 
-        return *this;
-    }
+    //    return *this;
+    //}
 
-    VAO(VAO&& other)
-    {
-        std::cout <<"Calling VAO move constructor."<<std::endl;
-        this->vaoID = other.vaoID;
-        this->eboID = other.eboID;
-        this->vboIDs = std::move(other.vboIDs);
-        this->vertexAttrCounter = other.vertexAttrCounter;
-    }
+    VAO(VAO&& other) = delete;
+    //{
+    //    std::cout <<"Calling VAO move constructor."<<std::endl;
+    //    this->vaoID = other.vaoID;
+    //    this->eboID = other.eboID;
+    //    this->vboIDs = std::move(other.vboIDs);
+    //    this->vertexAttrCounter = other.vertexAttrCounter;
+    //}
 
-    VAO& operator=(VAO&& other)
-    {
-        std::cout <<"Calling VAO move assignment."<<std::endl;
-        this->vaoID = other.vaoID;
-        this->eboID = other.eboID;
-        this->vboIDs = std::move(other.vboIDs);
-        this->vertexAttrCounter = other.vertexAttrCounter;
+    VAO& operator=(VAO&& other) = delete;
+    //{
+    //    std::cout <<"Calling VAO move assignment."<<std::endl;
+    //    this->vaoID = other.vaoID;
+    //    this->eboID = other.eboID;
+    //    this->vboIDs = std::move(other.vboIDs);
+    //    this->vertexAttrCounter = other.vertexAttrCounter;
 
-        return *this;
-    }
+    //    return *this;
+    //}
 
     ~VAO()
     {
@@ -75,7 +75,7 @@ public:
         glDeleteBuffers(1, &eboID);
         for(auto vbo : vboIDs)
         {
-        //glDeleteBuffers(1, &vbo);
+			glDeleteBuffers(1, &vbo);
         }
     }
 

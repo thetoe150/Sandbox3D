@@ -1,3 +1,4 @@
+#define GLFW_DLL
 #include "main.hpp"
 #include "input.hpp"
 
@@ -54,6 +55,9 @@ int main()
 
 	// config global opengl state
 	glEnable(GL_DEPTH_TEST);
+
+	//Assimp::Importer importer;
+	//const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
 	// load shader
 	// ---------------------------------------------------------------
@@ -186,12 +190,12 @@ int main()
 	textureShader.setFloat("uMaterial.shininess", 16.f);
 	textureShader.setFloat("uMaterial.brightness", 0.5f);
 
-	textureShader.setVec3("uDirLight.direction", glm::vec3(3.0f, 5.0f, 3.0f));
+	textureShader.setVec3("uDirLight.direction", glm::vec3(-3.0f, 0.0f, 1.0f));
 	textureShader.setVec3("uDirLight.ambient", glm::vec3(0.2f));
 	textureShader.setVec3("uDirLight.diffuse", glm::vec3(0.7f));
 	textureShader.setVec3("uDirLight.specular", glm::vec3(1.f));
 
-	textureShader.setVec3("uPointLight.position", glm::vec3(0.f, 5.0f, 3.0f));
+	textureShader.setVec3("uPointLight.position", glm::vec3(3.f, 0.0f, 1.0f));
 	textureShader.setVec3("uPointLight.ambient", glm::vec3(0.2f));
 	textureShader.setVec3("uPointLight.diffuse", glm::vec3(0.7f));
 	textureShader.setVec3("uPointLight.specular", glm::vec3(1.f));
@@ -202,13 +206,13 @@ int main()
 	//textureShader.setVec3("uSpotLight.position", glm::vec3(0.f, 5.0f, 3.0f));
 	//textureShader.setVec3("uSpotLight.direction", glm::vec3(1.0f));
 	textureShader.setFloat("uSpotLight.cutoff", 0.95f);
-	textureShader.setFloat("uSpotLight.outerCutoff", 0.92f);
+	textureShader.setFloat("uSpotLight.outerCutoff", 0.82f);
 	textureShader.setVec3("uSpotLight.ambient", glm::vec3(0.2f));
 	textureShader.setVec3("uSpotLight.diffuse", glm::vec3(0.7f));
 	textureShader.setVec3("uSpotLight.specular", glm::vec3(1.f));
 	textureShader.setFloat("uSpotLight.Kc", 1.0f);
-	textureShader.setFloat("uSpotLight.Kl", 0.005f);
-	textureShader.setFloat("uSpotLight.Kq", 0.0032f);
+	textureShader.setFloat("uSpotLight.Kl", 0.015f);
+	textureShader.setFloat("uSpotLight.Kq", 0.2192f);
 
 	colorShader.use();
 	colorShader.setVec3("uMaterial.ambient", glm::vec3(0.7f));
