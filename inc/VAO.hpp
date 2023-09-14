@@ -131,7 +131,7 @@ public:
 		return vertexAttrCounter - 1;
 	}
 	
-	void addEBO(unsigned int* data, unsigned int dataSize)
+	void addEBO(const unsigned int* data, unsigned int dataSize)
 	{
 		this->bind();
 		glGenBuffers(1, &eboID);

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "glad/glad.h"
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
@@ -23,8 +25,8 @@ public:
 		fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 		try
 		{
-			vShaderFile.open(vertexPath);
-			fShaderFile.open(fragmentPath);
+			vShaderFile.open(vertexPath, std::fstream::in);
+			fShaderFile.open(fragmentPath, std::fstream::in);
 
 			std::stringstream vShaderStream, fShaderStream;
 			vShaderStream << vShaderFile.rdbuf();

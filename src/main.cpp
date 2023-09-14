@@ -1,3 +1,4 @@
+#include "assimp/scene.h"
 #define GLFW_DLL
 #include "main.hpp"
 #include "input.hpp"
@@ -17,6 +18,19 @@ static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+
+void loadModel(std::string path)
+{
+	Assimp::Importer import;
+	const aiScene *scene = import.ReadFile(path, aiProcess_Triangulate 
+										| aiProcess_FlipUVs);
+	if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || scene->mRootNode)
+	{
+		std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
+	}
+};
+
 
 int main()
 {
@@ -56,13 +70,13 @@ int main()
 	// config global opengl state
 	glEnable(GL_DEPTH_TEST);
 
-	//Assimp::Importer importer;
 	//const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
 	// load shader
 	// ---------------------------------------------------------------
-	Shader colorShader("src/shader/color_phong.vs", "src/shader/color_phong.fs");
-	Shader textureShader("src/shader/texture_phong.vs", "src/shader/texture_phong.fs");
+	Shader colorShader("D:/PP/Sandbox/src/shader/color_phong.vs", "D:/PP/Sandbox/src/shader/color_phong.fs");
+	Shader textureShader("D:/PP/Sandbox/src/shader/texture_phong.vs", "D:/PP/Sandbox/src/shader/texture_phong.fs");
+	//Shader modelShader("src/shader/texture_phong.vs", "src/shader/model.fs");
 
 	// setup vertex array
 	// -------------------------------------------------------------------------
@@ -169,9 +183,9 @@ int main()
 
 	// bind texture
 	// -------------------------------------------------------------------------
-	unsigned int boxDiffTex = loadTexture("res/box_diff.png");
-	unsigned int boxSpecTex = loadTexture("res/box_spec.png");
-	unsigned int boxEmitTex = loadTexture("res/box_emit.png");
+	unsigned int boxDiffTex = loadTexture("D:/PP/Sandbox/res/box_diff.png");
+	unsigned int boxSpecTex = loadTexture("D:/PP/Sandbox/res/box_spec.png");
+	unsigned int boxEmitTex = loadTexture("D:/PP/Sandbox/res/box_emit.png");
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, boxDiffTex);
@@ -225,6 +239,26 @@ int main()
 	colorShader.setVec3("uLight.diffuse", glm::vec3(0.7f));
 	colorShader.setVec3("uLight.specular", glm::vec3(1.0f));
 
+	vag::Sphere movingSphere(1.f, 32, 32, true);
+	const float* sphereData = movingSphere.getInterleavedVertices();
+	unsigned int sphereDataSize = movingSphere.getInterleavedVertexSize();
+	const unsigned int* sphereIndices = movingSphere.getIndices();
+	unsigned int sphereIndexSize = movingSphere.getIndexSize();
+
+	VAO sphereVAO(sphereData, sphereDataSize, 3, 3, 2);
+	sphereVAO.addEBO(sphereIndices, sphereIndexSize);
+
+	vag::Cylinder staticPyramid(15.f, 10.f, 15.f);
+	const float* staticPyramidData = movingSphere.getInterleavedVertices();
+	unsigned int staticPyramidDataSize = movingSphere.getInterleavedVertexSize();
+	const unsigned int* staticPyramidIndices = movingSphere.getIndices();
+	unsigned int staticPyramidIndexSize = movingSphere.getIndexSize();
+
+	VAO staticPyramidVAO(staticPyramidData, staticPyramidDataSize, 3, 3, 2);
+	staticPyramidVAO.addEBO(staticPyramidIndices, staticPyramidIndexSize);
+
+	// Model backpack("res/backpack/backpack.obj");
+	//TODO: clean code
 
 	while(!glfwWindowShouldClose(window))
 	{
@@ -261,15 +295,34 @@ int main()
 		textureShader.use();
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
-		colorShader.use();
+		uModel = glm::translate(uModel, glm::vec3(-3.0f));
+		textureShader.setMat4("uModel", uModel);
+		sphereVAO.bind();
+		glDrawElements(GL_TRIANGLES, movingSphere.getIndexCount(), GL_UNSIGNED_INT, (void*)0);
+
+		staticPyramidVAO.bind();
+		glDrawElements(GL_TRIANGLES, staticPyramid.getIndexCount(), GL_UNSIGNED_INT, (void*)0);
+
+		//colorShader.use();
 		// update tranform uniform
 		//uModel = glm::translate(uModel, glm::vec3(-1.0f));
 		//uModel = glm::rotate(uModel, glm::radians(45.f), glm::vec3(1.0f));
 		//uModel = glm::scale(uModel, glm::vec3(1.0f));
-		colorShader.setMat4("uModel", uModel);
-		colorShader.setMat4("uView", uView);
-		colorShader.setMat4("uProjection", uProjection);
-		colorShader.setVec3("uViewPos", camera.getPosition());
+		//colorShader.setMat4("uModel", uModel);
+		//colorShader.setMat4("uView", uView);
+		//colorShader.setMat4("uProjection", uProjection);
+		//colorShader.setVec3("uViewPos", camera.getPosition());
+
+		//modelShader.setMat4("projection", uProjection);
+        //modelShader.setMat4("view", uView);
+
+        // render the loaded model
+        //glm::mat4 model = glm::mat4(1.0f);
+        //model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+        //model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+		
+        //modelShader.setMat4("model", model);
+        //backpack.draw(modelShader);
 
 		//colorBoxVAO.bind();
 		//colorShader.use();
@@ -380,7 +433,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		glfwSetWindowShouldClose(window, true);
 	}
 
-	if (key == GLFW_KEY_O && action == GLFW_RELEASE)
+	if (key == GLFW_KEY_O && action == GLFW_PRESS)
 	{
 		std::cout << "pewwwwwwwwwwww\n";
 	}

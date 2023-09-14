@@ -1,18 +1,31 @@
--- premake5.lua
-workspace("HelloWorld")
-	configurations({ "Debug", "Release" })
+workspace"Sandbox"
+	location"../"
+	configurations{"Debug","Release"}
 
-project "HelloWorld"
-   kind "ConsoleApp"
-   language "C"
-   targetdir "bin/%{cfg.buildcfg}"
+project"Sanbox"
+	location"build/"
+	kind"ConsoleApp"
+	language"C++"
+	files{
+		"src/**.cpp",
+		"src/**.c",
+		"inc/**.hpp",
+		"inc/**.h",
+	}
+	includedirs"inc/"
 
-   files { "**.h", "**.c" }
+	libdirs"lib/"
+	links{"glfw3dll", "assimp"}
 
-   filter "configurations:Debug"
-      defines { "DEBUG" }
-      symbols "On"
+	targetdir"bin/"
+	targetname"Sandbox"
 
-   filter "configurations:Release"
-      defines { "NDEBUG" }
-      optimize "On"
+	filter"configurations:Debug"
+	defines{"DEBUG"}
+	symbols"On"
+
+	filter"configurations:Release"
+	defines{"RELEASE"}
+	optimize"On"
+
+	filter{}
