@@ -17,6 +17,7 @@
 #include "texture.hpp"
 
 #include "VertexArrayGenerator.hpp"
+#include "Collision.hpp"
 
 #include "GlobalConstant.hpp"
 

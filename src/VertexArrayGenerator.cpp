@@ -450,8 +450,6 @@ void vag::Mesh::buildVerticesFlat()
             addVertex(x3, y3, z3);
             addVertex(x4, y4, z4);
 
-
-
             std::vector<float> n = computeFaceNormal(x1, y1, z1, x2, y2, z2, x3, y3, z3);
 
             for(int ni = 0; ni < 4; ++ni)
@@ -883,9 +881,12 @@ void vag::Cylinder::buildVerticesFlat()
     int vi1, vi2;               // indices
     int index = 0;
 
-    // v2-v4 <== stack at i+1
-    // | \ |
-    // v1-v3 <== stack at i
+	// j+1 j
+	// || ||
+	// v  v 
+    // v4-v2 <== stack at i+1
+    // | / |
+    // v3-v1 <== stack at i
     for(i = 0; i < stackCount; ++i)
     {
         vi1 = i * (sectorCount + 1);            // index of tmpVertices

@@ -1,4 +1,5 @@
 #include "assimp/scene.h"
+#include "glm/ext/quaternion_geometric.hpp"
 #define GLFW_DLL
 #include "main.hpp"
 #include "input.hpp"
@@ -19,6 +20,7 @@ static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
+void checkCollision(CollisionPacket* col, const vag::Cylinder& obj);
 
 void loadModel(std::string path)
 {
@@ -30,7 +32,6 @@ void loadModel(std::string path)
 		std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
 	}
 };
-
 
 int main()
 {
@@ -248,15 +249,17 @@ int main()
 	VAO sphereVAO(sphereData, sphereDataSize, 3, 3, 2);
 	sphereVAO.addEBO(sphereIndices, sphereIndexSize);
 
-	vag::Cylinder staticPyramid(15.f, 10.f, 15.f);
-	const float* staticPyramidData = movingSphere.getInterleavedVertices();
-	unsigned int staticPyramidDataSize = movingSphere.getInterleavedVertexSize();
-	const unsigned int* staticPyramidIndices = movingSphere.getIndices();
-	unsigned int staticPyramidIndexSize = movingSphere.getIndexSize();
+	vag::Cylinder staticPyramid(15.f, 5.f, 15.f, 3, 1, false);
+	const float* staticPyramidData = staticPyramid.getInterleavedVertices();
+	unsigned int staticPyramidDataSize = staticPyramid.getInterleavedVertexSize();
+	const unsigned int* staticPyramidIndices = staticPyramid.getIndices();
+	unsigned int staticPyramidIndexSize = staticPyramid.getIndexSize();
 
 	VAO staticPyramidVAO(staticPyramidData, staticPyramidDataSize, 3, 3, 2);
 	staticPyramidVAO.addEBO(staticPyramidIndices, staticPyramidIndexSize);
 
+	CollisionPacket* colPacket = 
+		new CollisionPacket(glm::vec3(1.f), glm::vec3(4.f, -4.f, 0.f), glm::vec3(0.f, 1.f, 1.f));
 	// Model backpack("res/backpack/backpack.obj");
 	//TODO: clean code
 
@@ -295,13 +298,15 @@ int main()
 		textureShader.use();
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
-		uModel = glm::translate(uModel, glm::vec3(-3.0f));
-		textureShader.setMat4("uModel", uModel);
-		sphereVAO.bind();
-		glDrawElements(GL_TRIANGLES, movingSphere.getIndexCount(), GL_UNSIGNED_INT, (void*)0);
-
 		staticPyramidVAO.bind();
 		glDrawElements(GL_TRIANGLES, staticPyramid.getIndexCount(), GL_UNSIGNED_INT, (void*)0);
+		checkCollision(colPacket, staticPyramid);
+		uModel = glm::translate(uModel, colPacket->r3Position);
+		textureShader.setMat4("uModel", uModel);
+		sphereVAO.bind();
+
+		glDrawElements(GL_TRIANGLES, movingSphere.getIndexCount(), GL_UNSIGNED_INT, (void*)0);
+
 
 		//colorShader.use();
 		// update tranform uniform
@@ -432,9 +437,48 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	{
 		glfwSetWindowShouldClose(window, true);
 	}
+}
 
-	if (key == GLFW_KEY_O && action == GLFW_PRESS)
+void checkCollision(CollisionPacket* col, const vag::Cylinder& obj) 
+{
+	unsigned int n = obj.getIndexSize() / sizeof(unsigned int);	
+	const float* vertices = obj.getVertices();
+	const unsigned int* indices = obj.getIndices();
+	const float* normals = obj.getNormals();
+	std::cout << "velocity vector: "  << col->eVelocity.x << " " 
+		<< col->eVelocity.y << " " << col->eVelocity.z<< "\n";
+	for(unsigned int i = 0; i < n; i += 3)
 	{
-		std::cout << "pewwwwwwwwwwww\n";
+		unsigned int index = 3 * indices[i];
+		glm::vec3 p1(vertices[index  ], vertices[index+1], vertices[index+2]);
+		index = 3 * indices[i+1];
+		glm::vec3 p2(vertices[index  ], vertices[index+1], vertices[index+2]);
+		index = 3 * indices[i+2];
+		glm::vec3 p3(vertices[index  ], vertices[index+1], vertices[index+2]);
+
+		glm::vec3 nor(normals[index  ], normals[index+1], normals[index+2]);
+		//std::cout << "generated normal: " << nor.x << " " << nor.y << " " << nor.z << "\n";
+
+		// NOTE: transform points to elipsoid space
+		p1 /= col->eRadius;
+		p2 /= col->eRadius;
+		p3 /= col->eRadius;
+		// std::cout << "\ncheck collision with points: " << p1.x <<" "<<p1.y<<" "<<p1.z;
+
+		checkTriangle(col, p1, p2, p3, -nor, deltaTime);
 	}
+
+	if(col->foundCollision)
+	{
+		//col->ePosition = col->intersectionPoint;
+		col->eVelocity = glm::reflect(col->eVelocity, col->intersectionNormal);
+		col->eNormalizedVelocity = glm::normalize(col->eVelocity);
+		std::cout << "Hit collision!!\n";
+		col->foundCollision = false;
+	}
+	else
+	{
+		col->ePosition = col->ePosition + col->eVelocity * deltaTime;
+	}
+	col->updateR3spaceAccord();
 }
