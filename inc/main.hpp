@@ -19,7 +19,9 @@
 #include "VertexArrayGenerator.hpp"
 #include "Collision.hpp"
 
-#include "GlobalConstant.hpp"
+#include "GlobalData.hpp"
+
+#include "Timer.hpp"
 
 //const int WINDOW_HEIGHT = 800;
 //const int WINDOW_WIDTH = 1200;

@@ -22,7 +22,7 @@ const glm::vec3 WORLD_UP(0.f, 1.f, 0.f);
 const float YAW				   = 90.f;
 const float PITCH			   = 0.f;
 
-const float MOVEMENT_SPEED	   = 5.0f;
+const float MOVEMENT_SPEED	   = 15.0f;
 const float MOUSE_MOVE_SPEED   = 0.1f;
 const float MOUSE_SCROLL_SPEED = 10.f;
 const float ZOOM			   = 45.f;

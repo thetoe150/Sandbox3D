@@ -148,8 +148,8 @@ void checkTriangle(CollisionPacket* colPackage, const glm::vec3& p1,
 	// We only check front-facing triangles
 	if (trianglePlane.isFrontFacingTo(colPackage->eNormalizedVelocity))
 	{
-		std::cout << trianglePlane.normal.x << " " << trianglePlane.normal.y 
-					<< " " << trianglePlane.normal.z<< "\n";
+		// std::cout << trianglePlane.normal.x << " " << trianglePlane.normal.y 
+		// 			<< " " << trianglePlane.normal.z<< "\n";
 		// Get interval of plane intersection:
 		double t0, t1;
 		bool embeddedInPlane = false;
@@ -191,7 +191,7 @@ void checkTriangle(CollisionPacket* colPackage, const glm::vec3& p1,
 				t1 = t0;
 				t0 = temp;
 			}
-			std::cout << "time: " << t0 << "\n";
+			// std::cout << "time: " << t0 << "\n";
 			// Check that at least one result is within range:
 			if (t0 > deltaTime || t1 < 0.0f)
 			{

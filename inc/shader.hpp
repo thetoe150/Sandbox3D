@@ -155,7 +155,7 @@ public:
         glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
     }
 	
-private:
+protected:
 	void checkCompileErrors(GLuint shader, std::string type, const char* Path)
 	{
 		GLint success = -1;
@@ -185,3 +185,52 @@ private:
 	}
 };
 
+class ComputeShader : public Shader{
+public:
+	ComputeShader(const char* computePath)
+	{
+		std::string cShaderStr;
+		std::ifstream cShaderFile;
+		cShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+		try
+		{
+			cShaderFile.open(computePath, std::fstream::in);
+			std::stringstream cShaderStream;
+			cShaderStream << cShaderFile.rdbuf();
+			cShaderFile.close();
+			cShaderStr = cShaderStream.str();
+		}
+		catch(std::ifstream::failure& e)
+		{
+			std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << std::endl;
+		}
+
+		const char* cShaderCode = cShaderStr.c_str();
+		GLuint cShaderID;
+		try
+		{
+			GLuint cShaderID = glCreateShader(GL_COMPUTE_SHADER);
+			glShaderSource(cShaderID, 1, &cShaderCode, NULL);
+			glCompileShader(cShaderID);
+			checkCompileErrors(cShaderID, "FRAGMENT", computePath);
+
+			this->ID = glCreateProgram();
+			glAttachShader(this->ID, cShaderID);
+			glLinkProgram(this->ID);
+			checkCompileErrors(this->ID, "PROGRAM", NULL);
+		}
+		catch(std::exception& e)
+		{
+			std::cout << "ERROR::SHADER::COMPILE_SHADER_NOT_SUCCESSFULLY: " << e.what() << std::endl;
+		}
+
+		glDeleteShader(cShaderID);
+	}
+
+	void compute(unsigned int x, unsigned int y, unsigned int z) const
+	{
+		//use();
+		glDispatchCompute(x, y, z);
+		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+	}
+};

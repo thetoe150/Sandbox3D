@@ -203,7 +203,7 @@ void vag::Object::printLog() const
               << "   Normal Size: " << getNormalSize() << "\n"
               << "  Texture Size: " << getTexCoordSize() << "\n"
               << "Triangle Count: " << getTriangleCount() << "\n"
-              << "  Vertex Count: " << getVertexCount() << "\n"
+              << "   Point Count: " << getVertexCount() << "\n"
               << "   Index Count: " << getIndexCount() << "\n";
 }
 

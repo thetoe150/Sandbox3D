@@ -1,17 +1,12 @@
 #include "assimp/scene.h"
 #include "glm/ext/quaternion_geometric.hpp"
+#include "shader.hpp"
 #define GLFW_DLL
 #include "main.hpp"
-#include "input.hpp"
 
-float deltaTime = 0.f;
-float lastTime = 0.f;
-float currentTime = 0.f;
 bool firstMouse = true;
 float lastX = 0.f;
 float lastY = 0.f;
-
-Camera camera;
 
 static void processInput(GLFWwindow *window);
 
@@ -37,7 +32,7 @@ int main()
 {
 	// glfw: configurate window and context
 	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 8);
@@ -53,6 +48,9 @@ int main()
 
 	// glfw: set window's context the current context
     glfwMakeContextCurrent(window);
+	// NOTE: glfw locks the refresh rate by default to 60fps
+	// set this to 0 to get bigger refresh rate than 60fps
+	//glfwSwapInterval(0);
 
 	// glfw: set callback function
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -70,13 +68,22 @@ int main()
 
 	// config global opengl state
 	glEnable(GL_DEPTH_TEST);
+	// NOTE: this functionality can use to check the direction of normal of the face
+	// since front-face point to the same direction with normal vector (right hand rule)
+	// glEnable(GL_CULL_FACE);
+	// default is set to cull the back face, call this to cull front face
+	// glCullFace(GL_FRONT);	
+	// default front face has counter clock-wise vertices, set this to change to clock-wise
+	// glCullFace(GL_CW);
 
 	//const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
 	// load shader
 	// ---------------------------------------------------------------
-	Shader colorShader("D:/PP/Sandbox/src/shader/color_phong.vs", "D:/PP/Sandbox/src/shader/color_phong.fs");
-	Shader textureShader("D:/PP/Sandbox/src/shader/texture_phong.vs", "D:/PP/Sandbox/src/shader/texture_phong.fs");
+	Shader colorShader("D:/PP/Sandbox/src/shader/color_phong_vs.glsl", 
+					"D:/PP/Sandbox/src/shader/color_phong_fs.glsl");
+	Shader textureShader("D:/PP/Sandbox/src/shader/texture_phong_vs.glsl", 
+					  "D:/PP/Sandbox/src/shader/texture_phong_fs.glsl");
 	//Shader modelShader("src/shader/texture_phong.vs", "src/shader/model.fs");
 
 	// setup vertex array
@@ -177,6 +184,7 @@ int main()
 		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
 		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f
 	};
+
 	VAO colorBoxVAO(colorBoxVertices, sizeof(colorBoxVertices), 3, 3, 3);
 	VAO textureBoxVAO(textureBoxVertices, sizeof(textureBoxVertices), 3, 3, 2);
 	
@@ -207,10 +215,10 @@ int main()
 
 	textureShader.setVec3("uDirLight.direction", glm::vec3(-3.0f, 0.0f, 1.0f));
 	textureShader.setVec3("uDirLight.ambient", glm::vec3(0.2f));
-	textureShader.setVec3("uDirLight.diffuse", glm::vec3(0.7f));
-	textureShader.setVec3("uDirLight.specular", glm::vec3(1.f));
+	textureShader.setVec3("uDirLight.diffuse", glm::vec3(0.2f));
+	textureShader.setVec3("uDirLight.specular", glm::vec3(0.2f));
 
-	textureShader.setVec3("uPointLight.position", glm::vec3(3.f, 0.0f, 1.0f));
+	textureShader.setVec3("uPointLight.position", glm::vec3(0.f, 0.0f, 0.0f));
 	textureShader.setVec3("uPointLight.ambient", glm::vec3(0.2f));
 	textureShader.setVec3("uPointLight.diffuse", glm::vec3(0.7f));
 	textureShader.setVec3("uPointLight.specular", glm::vec3(1.f));
@@ -220,14 +228,15 @@ int main()
 
 	//textureShader.setVec3("uSpotLight.position", glm::vec3(0.f, 5.0f, 3.0f));
 	//textureShader.setVec3("uSpotLight.direction", glm::vec3(1.0f));
-	textureShader.setFloat("uSpotLight.cutoff", 0.95f);
-	textureShader.setFloat("uSpotLight.outerCutoff", 0.82f);
+	// cutoff is the cos of the angle between cutoff edge and look angle
+	textureShader.setFloat("uSpotLight.cutoff", 0.98f);
+	textureShader.setFloat("uSpotLight.outerCutoff", 0.95f);
 	textureShader.setVec3("uSpotLight.ambient", glm::vec3(0.2f));
-	textureShader.setVec3("uSpotLight.diffuse", glm::vec3(0.7f));
+	textureShader.setVec3("uSpotLight.diffuse", glm::vec3(1.0f));
 	textureShader.setVec3("uSpotLight.specular", glm::vec3(1.f));
 	textureShader.setFloat("uSpotLight.Kc", 1.0f);
 	textureShader.setFloat("uSpotLight.Kl", 0.015f);
-	textureShader.setFloat("uSpotLight.Kq", 0.2192f);
+	textureShader.setFloat("uSpotLight.Kq", 0.002f);
 
 	colorShader.use();
 	colorShader.setVec3("uMaterial.ambient", glm::vec3(0.7f));
@@ -249,7 +258,7 @@ int main()
 	VAO sphereVAO(sphereData, sphereDataSize, 3, 3, 2);
 	sphereVAO.addEBO(sphereIndices, sphereIndexSize);
 
-	vag::Cylinder staticPyramid(15.f, 5.f, 15.f, 3, 1, false);
+	vag::Cylinder staticPyramid(30.f, 10.f, 30.f, 10, 10, false);
 	const float* staticPyramidData = staticPyramid.getInterleavedVertices();
 	unsigned int staticPyramidDataSize = staticPyramid.getInterleavedVertexSize();
 	const unsigned int* staticPyramidIndices = staticPyramid.getIndices();
@@ -259,15 +268,26 @@ int main()
 	staticPyramidVAO.addEBO(staticPyramidIndices, staticPyramidIndexSize);
 
 	CollisionPacket* colPacket = 
-		new CollisionPacket(glm::vec3(1.f), glm::vec3(4.f, -4.f, 0.f), glm::vec3(0.f, 1.f, 1.f));
+		new CollisionPacket(glm::vec3(1.f), glm::vec3(10.f, -10.f, 0.f), glm::vec3(0.f, 1.f, 1.f));
 	// Model backpack("res/backpack/backpack.obj");
 	//TODO: clean code
 
+	unsigned int speedCount = 0;
+
 	while(!glfwWindowShouldClose(window))
 	{
-		currentTime = static_cast<float>(glfwGetTime());
+			
+		float currentTime = static_cast<float>(glfwGetTime());
 		deltaTime = currentTime - lastTime;
 		lastTime = currentTime;
+
+		if(speedCount > 30)
+		{
+			std::cout << "FPS: " << 1 / deltaTime << std::endl;
+			speedCount = 0;
+		}
+		speedCount += 1;
+
 		processInput(window);
 
 		glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
@@ -323,8 +343,8 @@ int main()
 
         // render the loaded model
         //glm::mat4 model = glm::mat4(1.0f);
-        //model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-        //model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+        //model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+        //model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 		
         //modelShader.setMat4("model", model);
         //backpack.draw(modelShader);
@@ -340,7 +360,6 @@ int main()
 	glfwTerminate();
 	return 0;
 }
-
 
 static void processInput(GLFWwindow *window)
 {
@@ -390,7 +409,6 @@ static void processInput(GLFWwindow *window)
     //    xAngle += rotateVelocity;
     //if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
     //    xAngle -= rotateVelocity;
-
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -439,14 +457,24 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	}
 }
 
+// HACK: only check collision with 1 object by using it's vag.
 void checkCollision(CollisionPacket* col, const vag::Cylinder& obj) 
 {
 	unsigned int n = obj.getIndexSize() / sizeof(unsigned int);	
 	const float* vertices = obj.getVertices();
 	const unsigned int* indices = obj.getIndices();
 	const float* normals = obj.getNormals();
-	std::cout << "velocity vector: "  << col->eVelocity.x << " " 
-		<< col->eVelocity.y << " " << col->eVelocity.z<< "\n";
+
+	// WARNING: fuction to test compute shader and SSBO
+	//
+	//unsigned int size = obj.getNormalSize() / sizeof(float);
+	//std::cout << size << "\n";
+	//std::cout << "before compute: " << normals[2] << "\n";
+	// normals = reverseVec(normals, size);
+	//std::cout << "after compute: " << normals[2] << "\n";
+	
+	//std::cout << "velocity vector: "  << col->eVelocity.x << " " 
+	//	<< col->eVelocity.y << " " << col->eVelocity.z<< "\n";
 	for(unsigned int i = 0; i < n; i += 3)
 	{
 		unsigned int index = 3 * indices[i];
@@ -473,7 +501,7 @@ void checkCollision(CollisionPacket* col, const vag::Cylinder& obj)
 		//col->ePosition = col->intersectionPoint;
 		col->eVelocity = glm::reflect(col->eVelocity, col->intersectionNormal);
 		col->eNormalizedVelocity = glm::normalize(col->eVelocity);
-		std::cout << "Hit collision!!\n";
+		// std::cout << "Hit collision!!\n";
 		col->foundCollision = false;
 	}
 	else
