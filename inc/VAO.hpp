@@ -6,11 +6,8 @@
 
 class VAO
 {
-private:
-	unsigned int vaoID;
-	unsigned int eboID;
-	std::vector<unsigned int> vboIDs;
-	unsigned int vertexAttrCounter;	
+public:
+	unsigned int indexCount;
 
 public:
 	// constructor
@@ -131,13 +128,14 @@ public:
 		return vertexAttrCounter - 1;
 	}
 	
-	void addEBO(const unsigned int* data, unsigned int dataSize)
+	void addEBO(const unsigned int* data, unsigned int dataSize, unsigned int idxCount)
 	{
 		this->bind();
 		glGenBuffers(1, &eboID);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboID);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, dataSize, (void*)data, GL_STATIC_DRAW);
 		this->unbind();
+		this->indexCount = idxCount;
 	}
 	
 	void bind()
@@ -157,4 +155,10 @@ public:
         std::cout<<"EBO ID: "<< this->eboID <<std::endl;
     }
 	
+private:
+	unsigned int vaoID;
+	unsigned int eboID;
+	std::vector<unsigned int> vboIDs;
+	unsigned int vertexAttrCounter;	
+
 };
