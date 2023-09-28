@@ -19,6 +19,7 @@
 #include "VertexArrayGenerator.hpp"
 #include "Collision.hpp"
 
+#include "SetupGlobalConstant.hpp"
 #include "GlobalData.hpp"
 
 #include "Timer.hpp"

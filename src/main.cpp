@@ -1,7 +1,6 @@
+#define GLFW_DLL
 #include "assimp/scene.h"
 #include "glm/ext/quaternion_geometric.hpp"
-#include "shader.hpp"
-#define GLFW_DLL
 #include "main.hpp"
 
 bool firstMouse = true;

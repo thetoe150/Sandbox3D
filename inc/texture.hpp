@@ -2,7 +2,6 @@
 
 #include <iostream>
 
-#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.hpp"
 #include "glad/glad.h"
 
