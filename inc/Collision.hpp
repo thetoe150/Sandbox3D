@@ -23,9 +23,10 @@ class PLANE{
 	double signedDistanceTo(const glm::vec3& point) const;
 };
 
-class CollisionPacket {
+class CollisionComponent {
 public:
-	CollisionPacket(glm::vec3 radius, glm::vec3 vel, glm::vec3 pos);
+	CollisionComponent(){};
+	CollisionComponent(glm::vec3 radius, glm::vec3 vel, glm::vec3 pos);
 
 	void updateEspaceAccord();
 	void updateR3spaceAccord();
@@ -45,6 +46,6 @@ public:
 	glm::vec3 intersectionNormal{0};
 };
 
-void checkTriangle(CollisionPacket* colPackage, const glm::vec3& p1,
+void checkTriangle(CollisionComponent* colPackage, const glm::vec3& p1,
 				   const glm::vec3& p2, const glm::vec3& p3, 
 				   const glm::vec3& normal, float deltaTime);

@@ -8,7 +8,8 @@
 
 class ObjectFactory{
 public:
-	virtual VAO* makeVAO(float p1, float p2, float p3);
+	virtual vag::Object* makeVertexData(float p1, float p2, float p3);
+	VAO* makeVAO(vag::Object*);
 	Shader makeShader(SHADERS s);
 	unsigned int makeTexture(TEXTURES t);
 
@@ -19,12 +20,12 @@ protected:
 class SphereFactory : public ObjectFactory{
 public:
 	SphereFactory();
-	VAO* makeVAO(float p1, float p2, float p3) override;
+	vag::Object* makeVertexData(float p1, float p2, float p3) override;
 };
 
 class CylinderFactory : public ObjectFactory{
 public:
 	CylinderFactory();
-	VAO* makeVAO(float p1, float p2, float p3) override;
+	vag::Object* makeVertexData(float p1, float p2, float p3) override;
 };
 

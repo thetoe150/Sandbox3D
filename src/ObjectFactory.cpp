@@ -1,11 +1,6 @@
 #include "ObjectFactory.hpp"
 #include "VertexArrayGenerator.hpp"
 
-VAO* ObjectFactory::makeVAO(float radius, float sector, float stack)
-{
-	return nullptr;
-}
-
 SphereFactory::SphereFactory()
 	: ObjectFactory()
 {}
@@ -24,33 +19,35 @@ unsigned int ObjectFactory::makeTexture(TEXTURES t)
 	return TextureCollection[t];
 };
 
-VAO* SphereFactory::makeVAO(float p1, float p2, float p3)
+VAO* ObjectFactory::makeVAO(vag::Object* object)
 {
-	vag::Sphere sphere(p1, (int)p2, (int)p3);
-	const float* sphereVertexData = sphere.getInterleavedVertices();
-	unsigned int sphereVertexSize = sphere.getInterleavedVertexSize();
-	const unsigned int* sphereIndexData = sphere.getIndices();
-	unsigned int sphereIndexSize = sphere.getIndexSize();
-	unsigned int sphereIndexCount = sphere.getIndexCount();
+	const float* VertexData = object->getInterleavedVertices();
+	unsigned int VertexSize = object->getInterleavedVertexSize();
+	const unsigned int* IndexData = object->getIndices();
+	unsigned int IndexSize = object->getIndexSize();
+	unsigned int IndexCount = object->getIndexCount();
 
-	VAO* sphereVAO = new VAO(sphereVertexData, sphereVertexSize, 3, 3, 2);
-	sphereVAO->addEBO(sphereIndexData, sphereIndexSize, sphereIndexCount);
+	VAO* vao = new VAO(VertexData, VertexSize, 3, 3, 2);
+	vao->addEBO(IndexData, IndexSize, IndexCount);
 
-	return sphereVAO;
+	return vao;
+};
+vag::Object* ObjectFactory::makeVertexData(float p1, float p2, float p3)
+{
+	return nullptr;
 };
 
-VAO* CylinderFactory::makeVAO(float p1, float p2, float p3)
+vag::Object* SphereFactory::makeVertexData(float p1, float p2, float p3)
 {
-	vag::Cylinder cylinder(p1, p2, p3);
-	const float* cylinderVertexData = cylinder.getInterleavedVertices();
-	unsigned int cylinderVertexSize = cylinder.getInterleavedVertexSize();
-	const unsigned int* cylinderIndexData = cylinder.getIndices();
-	unsigned int cylinderIndexSize = cylinder.getIndexSize();
-	unsigned int cylinderIndexCount = cylinder.getIndexCount();
+	vag::Sphere* sphere = new vag::Sphere(p1, (int)p2, (int)p3);
 
-	VAO* cylinderVAO = new VAO(cylinderVertexData, cylinderVertexSize, 3, 3, 2);
-	cylinderVAO->addEBO(cylinderIndexData, cylinderIndexSize, cylinderIndexCount);
+	return sphere;
+};
 
-	return cylinderVAO;
+vag::Object* CylinderFactory::makeVertexData(float p1, float p2, float p3)
+{
+	vag::Cylinder* cylinder = new vag::Cylinder(p1, p2, p3);
+
+	return cylinder;
 };
 

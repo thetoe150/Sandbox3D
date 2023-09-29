@@ -1,4 +1,5 @@
 #include "Collision.hpp"
+#include "VertexArrayGenerator.hpp"
 
 PLANE::PLANE(const glm::vec3& origin, const glm::vec3& normal)
 	: origin(origin), normal(normal)
@@ -32,24 +33,25 @@ double PLANE::signedDistanceTo(const glm::vec3& point) const
 }
 
 
-CollisionPacket::CollisionPacket(glm::vec3 radius, glm::vec3 vel, glm::vec3 pos) 
+CollisionComponent::CollisionComponent(glm::vec3 radius, glm::vec3 vel, glm::vec3 pos) 
 	: eRadius(radius), r3Position(pos), r3Velocity(vel)
 {
 	updateEspaceAccord();
 }
 
-void CollisionPacket::updateEspaceAccord()
+void CollisionComponent::updateEspaceAccord()
 {
 	ePosition = r3Position / eRadius;
 	eVelocity = r3Velocity / eRadius;
 	eNormalizedVelocity = glm::normalize(eVelocity);
 }
 
-void CollisionPacket::updateR3spaceAccord()
+void CollisionComponent::updateR3spaceAccord()
 {
 	r3Position = ePosition * eRadius;
 	r3Velocity = eVelocity * eRadius;
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 //                               Apendix C                                    //
 ////////////////////////////////////////////////////////////////////////////////
@@ -120,14 +122,6 @@ bool getLowestRoot(float a, float b, float c, float maxR, float* root)
 //                               Apendix E                                    //
 ////////////////////////////////////////////////////////////////////////////////
 
-// NOTE: Below is a source listing of the whole “triangle vs. moving sphere” procedure
-// I discussed in Chapter 3. Data about the move is comming in through the
-// “CollisionPacket” and this is also where we put the result of the check against
-// the triangle. I appologize for the formatting but I really had to compress
-// things to make them fit into a rather narrow LaTex page.
-// First the structure I use to pass in information about the move and in
-// which I store the result of the collision tests:
-
 // Square
 float squaredLength(glm::vec3 v)
 {
@@ -135,7 +129,7 @@ float squaredLength(glm::vec3 v)
 }
 // NOTE: And below a function that’ll check a single triangle for collision:
 // Assumes: p1,p2 and p3 are given in ellisoid space:
-void checkTriangle(CollisionPacket* colPackage, const glm::vec3& p1,
+void checkTriangle(CollisionComponent* colPackage, const glm::vec3& p1,
 				   const glm::vec3& p2, const glm::vec3& p3, 
 				   const glm::vec3& normal, float deltaTime)
 {
@@ -382,13 +376,6 @@ void checkTriangle(CollisionPacket* colPackage, const glm::vec3& p1,
 //                               Apendix F                                    //
 ////////////////////////////////////////////////////////////////////////////////
 
-// NOTE: Code for response step
-// Below is a source listing for the response step. You will have to tweak this to
-// match your own needs - this lising is just for inspiration. The application calls
-// the “collideAndSlide” with eVelocity and gravity input in R3. The function
-// converts this input to eSpace and calls the actual recursive collision and
-// response function “collideWithWorld”. Finally it converts the result back to
-// R3 and updates the character position.
 
 // Set this to match application scale..
 // const float unitsPerMeter = 100.0f;
@@ -480,3 +467,4 @@ void checkTriangle(CollisionPacket* colPackage, const glm::vec3& p1,
 // 	// Move the entity (application specific function)
 // 	MoveTo(finalPosition);
 // }
+//

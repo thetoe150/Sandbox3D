@@ -1,9 +1,14 @@
 #include "Object.hpp"
 
-Object::Object(VAO* VAO, Shader shader, std::vector<unsigned int> tex)
-	: m_VAO(VAO), m_shader(shader), m_textures(tex)
+Object::Object(vag::Object* vertexData, VAO* VAO, Shader shader, std::vector<unsigned int> tex)
+	: m_vertexData(vertexData), m_VAO(VAO), m_shader(shader), m_textures(tex)
 {
 	setup();	
+}
+
+Object::~Object()
+{
+	delete this->m_vertexData;
 }
 
 void Object::setup()
@@ -48,9 +53,10 @@ void Object::draw(const Camera& camera)
 	m_shader.use();
 
 	glm::mat4 uModel(1.f);
-	//uModel = glm::translate(uModel, glm::vec3(-1.0f));
-	//uModel = glm::rotate(uModel, glm::radians(45.f), glm::vec3(1.0f));
-	//uModel = glm::scale(uModel, glm::vec3(1.0f));
+	uModel = glm::translate(uModel, m_collision->r3Position);
+	// uModel = glm::rotate(uModel, glm::radians(45.f), glm::vec3(1.0f));
+	// uModel = glm::scale(uModel, glm::vec3(1.0f));
+
 	glm::mat4 uView = camera.getLookAtMatrix();
 	glm::mat4 uProjection = glm::perspective(glm::radians(camera.getZoom()), 
 								(float) WINDOW_WIDTH / (float)WINDOW_HEIGHT,
@@ -71,4 +77,67 @@ void Object::draw(const Camera& camera)
 	}
 
 	glDrawElements(GL_TRIANGLES, m_VAO->indexCount, GL_UNSIGNED_INT, (void*)0);
+}
+
+vag::Object* Object::getVertexData()
+{
+	return this->m_vertexData;
+}
+
+void Object::addCollision(CollisionComponent* coll)
+{
+	m_collision = coll;
+}
+
+void Object::checkCollision(vag::Object* data) 
+{
+	unsigned int n = data->getIndexSize() / sizeof(unsigned int);	
+	const float* vertices = data->getVertices();
+	const unsigned int* indices = data->getIndices();
+	const float* normals = data->getNormals();
+
+	// WARNING: fuction to test compute shader and SSBO
+	//
+	//unsigned int size = obj.getNormalSize() / sizeof(float);
+	//std::cout << size << "\n";
+	//std::cout << "before compute: " << normals[2] << "\n";
+	// normals = reverseVec(normals, size);
+	//std::cout << "after compute: " << normals[2] << "\n";
+	
+	//std::cout << "velocity vector: "  << m_collision->eVelocity.x << " " 
+	//	<< m_collision->eVelocity.y << " " << m_collision->eVelocity.z<< "\n";
+	for(unsigned int i = 0; i < n; i += 3)
+	{
+		unsigned int index = 3 * indices[i];
+		glm::vec3 p1(vertices[index  ], vertices[index+1], vertices[index+2]);
+		index = 3 * indices[i+1];
+		glm::vec3 p2(vertices[index  ], vertices[index+1], vertices[index+2]);
+		index = 3 * indices[i+2];
+		glm::vec3 p3(vertices[index  ], vertices[index+1], vertices[index+2]);
+
+		glm::vec3 nor(normals[index  ], normals[index+1], normals[index+2]);
+		//std::cout << "generated normal: " << nor.x << " " << nor.y << " " << nor.z << "\n";
+
+		// NOTE: transform points to elipsoid space
+		p1 /= m_collision->eRadius;
+		p2 /= m_collision->eRadius;
+		p3 /= m_collision->eRadius;
+		// std::cout << "\ncheck m_collisionlision with points: " << p1.x <<" "<<p1.y<<" "<<p1.z;
+
+		checkTriangle(m_collision, p1, p2, p3, -nor, deltaTime);
+	}
+
+	if(m_collision->foundCollision)
+	{
+		//m_collision->ePosition = m_collision->intersectionPoint;
+		m_collision->eVelocity = glm::reflect(m_collision->eVelocity, m_collision->intersectionNormal);
+		m_collision->eNormalizedVelocity = glm::normalize(m_collision->eVelocity);
+		// std::cout << "Hit m_collisionlision!!\n";
+		m_collision->foundCollision = false;
+	}
+	else
+	{
+		m_collision->ePosition = m_collision->ePosition + m_collision->eVelocity * deltaTime;
+	}
+	m_collision->updateR3spaceAccord();
 }
