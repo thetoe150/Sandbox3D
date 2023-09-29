@@ -42,28 +42,28 @@ public:
 
 	// Lookat matrix
 	// -------------------------------------------------------------------------
-	glm::mat4 getLookAtMatrix()
+	glm::mat4 getLookAtMatrix() const
 	{
 		return glm::lookAt(m_position, m_position + m_front, m_up);
 	}
 
 	// get zoom 
 	// -------------------------------------------------------------------------
-	float getZoom()
+	float getZoom() const
 	{
 		return m_zoom;
 	}
 
 	// get position 
 	// -------------------------------------------------------------------------
-	glm::vec3 getPosition()
+	glm::vec3 getPosition() const
 	{
 		return m_position;
 	}
 
 	// get front 
 	// -------------------------------------------------------------------------
-	glm::vec3 getFront()
+	glm::vec3 getFront() const
 	{
 		return m_front;
 	}

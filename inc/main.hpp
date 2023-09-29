@@ -19,10 +19,14 @@
 #include "VertexArrayGenerator.hpp"
 #include "Collision.hpp"
 
-#include "SetupGlobalConstant.hpp"
+#include "Resource.hpp"
 #include "GlobalData.hpp"
+#include "ObjectFactory.hpp"
+#include "Object.hpp"
 
 #include "Timer.hpp"
+
+#include "Application.hpp"
 
 //const int WINDOW_HEIGHT = 800;
 //const int WINDOW_WIDTH = 1200;

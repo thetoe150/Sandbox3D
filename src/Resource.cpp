@@ -1,6 +1,7 @@
-#include "SetupGlobalConstant.hpp"
+#include "Resource.hpp"
 
 std::unordered_map<SHADERS, Shader> ShaderCollection{0};
+std::unordered_map<TEXTURES, unsigned int> TextureCollection{0};
 
 void LoadAllShader()
 {
@@ -12,8 +13,6 @@ void LoadAllShader()
 	ShaderCollection[SHADERS::PHONG_3_LIGHT] = textureShader;
 	ShaderCollection[SHADERS::COLOR_LIGHT] = colorShader;
 }
-
-std::unordered_map<TEXTURES, unsigned int> TextureCollection{0};
 
 void LoadAllTexture()
 {

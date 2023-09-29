@@ -1,3 +1,5 @@
+#pragma once
+
 #include "iostream"
 
 #include "glm/geometric.hpp"
@@ -42,6 +44,7 @@ public:
 	glm::vec3 intersectionPoint{0};
 	glm::vec3 intersectionNormal{0};
 };
+
 void checkTriangle(CollisionPacket* colPackage, const glm::vec3& p1,
 				   const glm::vec3& p2, const glm::vec3& p3, 
 				   const glm::vec3& normal, float deltaTime);
