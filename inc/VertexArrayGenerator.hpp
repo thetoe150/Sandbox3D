@@ -23,7 +23,7 @@ namespace vag
         // ctor/dtor
         Object() = default;
         Object(const Object&) = default;
-        ~Object() {}
+        virtual ~Object() {}
 
         // getters/setters
         void setSmooth(bool smooth);

@@ -1,11 +1,14 @@
 #include "Application.hpp"
+#include "VertexArrayGenerator.hpp"
 
 bool firstMouse = true;
 float lastX = 0.f;
 float lastY = 0.f;
 unsigned int speedCount = 0;
 
-std::vector<Object*> objects;
+std::vector<Object*> StaticObjects;
+std::vector<Object*> DynamicObjects;
+static void createBall();
 
 GLFWwindow* SetupContext()
 {
@@ -59,33 +62,44 @@ GLFWwindow* SetupContext()
 
 void LoadResource()
 {
-	std::cout << "Load Render resource.\n";
+	std::cout << "Load render resources.\n";
 	// load shader
 	LoadAllShader();
 
 	// load texture
 	LoadAllTexture();
 
+	//const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+	// Model backpack("res/backpack/backpack.obj");
+}
+
+void CreateObject()
+{
+	std::cout << "Create objects.\n";
 	SphereFactory sphereFactory;
-	VAO* SphereVAO = sphereFactory.makeVAO(1.f, 32.f, 32.f);
+	vag::Object* sphereData = sphereFactory.makeVertexData(1.f, 32.f, 32.f);
+	VAO* SphereVAO = sphereFactory.makeVAO(sphereData);
 	unsigned int tex1 = sphereFactory.makeTexture(TEXTURES::BOX_DIFF);
 	unsigned int tex2 = sphereFactory.makeTexture(TEXTURES::BOX_SPEC);
 	unsigned int tex3 = sphereFactory.makeTexture(TEXTURES::BOX_EMIT);
 	Shader shader = sphereFactory.makeShader(SHADERS::PHONG_3_LIGHT);
 
-	objects.push_back(new Object(SphereVAO, shader, std::vector<unsigned int>{tex1, tex2, tex3}));
+	CollisionComponent* colComponent = 
+		new CollisionComponent(glm::vec3(1.f), glm::vec3(10.f, -10.f, 0.f), glm::vec3(0.f, 1.f, 1.f));
+	auto sphereObj = new Object(sphereData, SphereVAO, shader, std::vector<unsigned int>{tex1, tex2, tex3});
+	sphereObj->addCollision(colComponent);
+	DynamicObjects.push_back(sphereObj);
 
 	CylinderFactory cylinderFactory;
-	VAO* cylinderVAO = cylinderFactory.makeVAO(15.f, 10.f, 30.f);
+	// NOTE: this makeVertexData allocate memory and the Object own that memory
+	vag::Object* cylinderData = cylinderFactory.makeVertexData(30.f, 15.f, 30.f);
+	VAO* cylinderVAO = sphereFactory.makeVAO(cylinderData);
 
-	objects.push_back(new Object(cylinderVAO, shader, std::vector<unsigned int>{tex1, tex2, tex3}));
-
-	CollisionPacket* colPacket = 
-		new CollisionPacket(glm::vec3(1.f), glm::vec3(10.f, -10.f, 0.f), glm::vec3(0.f, 1.f, 1.f));
-
-
-	//const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
-	// Model backpack("res/backpack/backpack.obj");
+	CollisionComponent* nullColl = 
+		new CollisionComponent(glm::vec3(1.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 0.f, 0.f));
+	auto cylinderObj = new Object(cylinderData, cylinderVAO, shader, std::vector<unsigned int>{tex1, tex2, tex3});
+	cylinderObj->addCollision(nullColl);
+	StaticObjects.push_back(cylinderObj);
 }
 
 void ProcessInput(GLFWwindow* window)
@@ -126,6 +140,7 @@ void ProcessInput(GLFWwindow* window)
     if(glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
+
     //// key for rotate object
     //float rotateVelocity = deltaTime * 40.0f;
     //if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
@@ -150,6 +165,17 @@ void Update()
 		speedCount = 0;
 	}
 	speedCount += 1;
+
+	// NOTE: Collision
+	for(const auto& dO : DynamicObjects)
+	{
+		for(const auto& sO : StaticObjects)
+		{
+			dO->checkCollision(sO->getVertexData());
+		}
+	}
+
+	// NOTE: Move object
 }
 
 void Render(GLFWwindow* window)
@@ -158,35 +184,18 @@ void Render(GLFWwindow* window)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-	for(const auto& o : objects)
+	for(const auto& o : StaticObjects)
 	{
 		o->draw(camera);
 	}
 
-	//colorShader.use();
-	// update tranform uniform
-	//uModel = glm::translate(uModel, glm::vec3(-1.0f));
-	//uModel = glm::rotate(uModel, glm::radians(45.f), glm::vec3(1.0f));
-	//uModel = glm::scale(uModel, glm::vec3(1.0f));
-	//colorShader.setMat4("uModel", uModel);
-	//colorShader.setMat4("uView", uView);
-	//colorShader.setMat4("uProjection", uProjection);
-	//colorShader.setVec3("uViewPos", camera.getPosition());
-
-	//modelShader.setMat4("projection", uProjection);
-	//modelShader.setMat4("view", uView);
-
-	// render the loaded model
-	//glm::mat4 model = glm::mat4(1.0f);
-	//model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-	//model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+	for(const auto& o : DynamicObjects)
+	{
+		o->draw(camera);
+	}
 	
 	//modelShader.setMat4("model", model);
 	//backpack.draw(modelShader);
-
-	//colorBoxVAO.bind();
-	//colorShader.use();
-	//glDrawArrays(GL_TRIANGLES, 0, 36);
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();
@@ -237,4 +246,24 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	{
 		glfwSetWindowShouldClose(window, true);
 	}
+
+    if (key == GLFW_KEY_C && action == GLFW_PRESS)
+		createBall();
+}
+
+static void createBall()
+{
+	SphereFactory sphereFactory;
+	vag::Object* sphereData = sphereFactory.makeVertexData(1.f, 32.f, 32.f);
+	VAO* SphereVAO = sphereFactory.makeVAO(sphereData);
+	unsigned int tex1 = sphereFactory.makeTexture(TEXTURES::BOX_DIFF);
+	unsigned int tex2 = sphereFactory.makeTexture(TEXTURES::BOX_SPEC);
+	unsigned int tex3 = sphereFactory.makeTexture(TEXTURES::BOX_EMIT);
+	Shader shader = sphereFactory.makeShader(SHADERS::PHONG_3_LIGHT);
+
+	CollisionComponent* colComponent = 
+		new CollisionComponent(glm::vec3(1.f), glm::vec3(10.f, -10.f, 0.f), glm::vec3(0.f, 1.f, 1.f));
+	auto sphereObj = new Object(sphereData, SphereVAO, shader, std::vector<unsigned int>{tex1, tex2, tex3});
+	sphereObj->addCollision(colComponent);
+	DynamicObjects.push_back(sphereObj);
 }

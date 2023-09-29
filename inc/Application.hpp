@@ -11,6 +11,7 @@
 
 GLFWwindow* SetupContext();
 void LoadResource();
+void CreateObject();
 void ProcessInput(GLFWwindow* window);
 void Update();
 void Render(GLFWwindow* window);
