@@ -2,24 +2,29 @@
 
 #include <iostream>
 
-#include "SetupGlobalConstant.hpp"
+#include "Resource.hpp"
 #include "VertexArrayGenerator.hpp"
 #include "VAO.hpp"
 
 class ObjectFactory{
 public:
-	virtual VAO* makeVAO(float radius, int sector, int stack);
-	Shader makeShaderRef(SHADERS s);
-	unsigned int makeTextureRef(TEXTURES t);
+	virtual VAO* makeVAO(float p1, float p2, float p3);
+	Shader makeShader(SHADERS s);
+	unsigned int makeTexture(TEXTURES t);
 
 protected:
-	ObjectFactory();
+	ObjectFactory(){};
 };
 
 class SphereFactory : public ObjectFactory{
 public:
 	SphereFactory();
-	VAO* makeVAO(float radius, int sector, int stack) override;
+	VAO* makeVAO(float p1, float p2, float p3) override;
 };
 
-void drawSphere(SphereFactory s);
+class CylinderFactory : public ObjectFactory{
+public:
+	CylinderFactory();
+	VAO* makeVAO(float p1, float p2, float p3) override;
+};
+

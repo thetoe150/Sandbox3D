@@ -181,7 +181,7 @@ namespace vag
     public:
         // ctor/dtor
         Cylinder(float baseRadius=1.0f, float topRadius=1.0f, float height=1.0f,
-                int sectorCount=36, int stackCount=1, bool smooth=true, int up=2);
+                int sectorCount=36, int stackCount=2, bool smooth=true, int up=2);
         ~Cylinder() {}
 
         // getters/setters

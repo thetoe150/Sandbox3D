@@ -2,6 +2,8 @@
 
 #include "camera.hpp"
 
+// Constants 
+// --------------------------------------------------------------------------------
 extern const int WINDOW_HEIGHT;
 extern const int WINDOW_WIDTH;
 
@@ -12,8 +14,9 @@ extern const unsigned int colorBoxVerticesLength;
 extern const float textureBoxVertices[];
 extern const unsigned int textureBoxVerticesLength;
 
+// Variables 
+// --------------------------------------------------------------------------------
 extern float deltaTime;
 extern float lastTime;
 
 extern Camera camera;
-
