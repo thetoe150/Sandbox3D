@@ -1,5 +1,6 @@
 #include "Application.hpp"
 #include "VertexArrayGenerator.hpp"
+#include <stdexcept>
 
 bool firstMouse = true;
 float lastX = 0.f;
@@ -26,7 +27,7 @@ GLFWwindow* SetupContext()
     {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
-        // return -1;
+		throw std::runtime_error("Failed to create GLFW window");
     }
 
 	// glfw: set window's context the current context
@@ -43,7 +44,7 @@ GLFWwindow* SetupContext()
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
-        // return -1;
+		throw std::runtime_error("Failed to initialize GLAD");
     }
 
 	// config global opengl state

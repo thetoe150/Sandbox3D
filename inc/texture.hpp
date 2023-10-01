@@ -40,7 +40,7 @@ static unsigned int loadTexture(const char* path)
 	}
 	else
 	{
-		std::cout << "Texture failed to lead at path" << path <<std::endl;
+		std::cout << "Texture failed to load at path" << path <<std::endl;
 		stbi_image_free(data);	
 	}
 

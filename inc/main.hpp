@@ -1,5 +1,7 @@
 #pragma once
 
+// TODO: Cleanup the these include.
+
 #include <iostream>
 
 #include "glad/glad.h"
