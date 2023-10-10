@@ -45,25 +45,27 @@ public:
     //    return *this;
     //}
 
-    VAO(VAO&& other) = delete;
-    //{
-    //    std::cout <<"Calling VAO move constructor."<<std::endl;
-    //    this->vaoID = other.vaoID;
-    //    this->eboID = other.eboID;
-    //    this->vboIDs = std::move(other.vboIDs);
-    //    this->vertexAttrCounter = other.vertexAttrCounter;
-    //}
+    VAO(VAO&& other)
+    {
+        std::cout <<"Calling VAO move constructor."<<std::endl;
+		this->indexCount = other.indexCount;
+        this->vaoID = other.vaoID;
+        this->eboID = other.eboID;
+		this->vboIDs = std::move(other.vboIDs);
+        this->vertexAttrCounter = other.vertexAttrCounter;
+    }
 
-    VAO& operator=(VAO&& other) = delete;
-    //{
-    //    std::cout <<"Calling VAO move assignment."<<std::endl;
-    //    this->vaoID = other.vaoID;
-    //    this->eboID = other.eboID;
-    //    this->vboIDs = std::move(other.vboIDs);
-    //    this->vertexAttrCounter = other.vertexAttrCounter;
+    VAO& operator=(VAO&& other)
+    {
+        std::cout <<"Calling VAO move assignment."<<std::endl;
+		this->indexCount = other.indexCount;
+        this->vaoID = other.vaoID;
+        this->eboID = other.eboID;
+        this->vboIDs = std::move(other.vboIDs);
+        this->vertexAttrCounter = other.vertexAttrCounter;
 
-    //    return *this;
-    //}
+        return *this;
+    }
 
     ~VAO()
     {

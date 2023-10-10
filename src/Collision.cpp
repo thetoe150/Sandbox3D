@@ -9,6 +9,7 @@ PLANE::PLANE(const glm::vec3& origin, const glm::vec3& normal)
 	equation[2] = normal.z;
 	equation[3] = -(normal.x * origin.x + normal.y * origin.y + normal.z * origin.z);
 }
+
 // Construct from triangle:
 PLANE::PLANE(const glm::vec3& p1,const glm::vec3& p2,const glm::vec3& p3)
 {
@@ -26,6 +27,7 @@ bool PLANE::isFrontFacingTo(const glm::vec3& direction) const
 	double dot = glm::dot(normal, direction);
 	return (dot <= 0);
 }
+
 double PLANE::signedDistanceTo(const glm::vec3& point) const 
 {
 	// equation[3] is d, the perpendicular distance of the plane from the origin.
@@ -52,9 +54,8 @@ void CollisionComponent::updateR3spaceAccord()
 	r3Velocity = eVelocity * eRadius;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-//                               Apendix C                                    //
-////////////////////////////////////////////////////////////////////////////////
+// Check if point is inside triangle form from 3 vetices
+// -----------------------------------------------------------------------------------------
 
 typedef unsigned int uint32;
 #define in(a) ((uint32&) a)
@@ -76,12 +77,8 @@ bool checkPointInTriangle(const glm::vec3& point, const glm::vec3& pa,
 	return ((in(z) & ~(in(x) | in(y))) & 0x80000000);
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-//                               Apendix D                                    //
-////////////////////////////////////////////////////////////////////////////////
-
-// NOTE: Solving quadratic equations
+// Solving quadratic equations
+// -----------------------------------------------------------------------------------------
 
 bool getLowestRoot(float a, float b, float c, float maxR, float* root)
 {
@@ -118,18 +115,18 @@ bool getLowestRoot(float a, float b, float c, float maxR, float* root)
 	return false;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-//                               Apendix E                                    //
-////////////////////////////////////////////////////////////////////////////////
-
-// Square
+// Square length
+// ----------------------------------------------------------------------------------------
 float squaredLength(glm::vec3 v)
 {
 	return v.x * v.x + v.y * v.y + v.z * v.z;
 }
+// Collision check
+//-----------------------------------------------------------------------------------------
+
 // NOTE: And below a function that’ll check a single triangle for collision:
 // Assumes: p1,p2 and p3 are given in ellisoid space:
-void checkTriangle(CollisionComponent* colPackage, const glm::vec3& p1,
+void checkTriangle(std::unique_ptr<CollisionComponent>&& colPackage, const glm::vec3& p1,
 				   const glm::vec3& p2, const glm::vec3& p3, 
 				   const glm::vec3& normal, float deltaTime)
 {
@@ -370,101 +367,3 @@ void checkTriangle(CollisionComponent* colPackage, const glm::vec3& p1,
 		}
 	} // if not backface
 }
-
-
-////////////////////////////////////////////////////////////////////////////////
-//                               Apendix F                                    //
-////////////////////////////////////////////////////////////////////////////////
-
-
-// Set this to match application scale..
-// const float unitsPerMeter = 100.0f;
-// 
-// glm::vec3 collideWithWorld(const glm::vec3& pos, const glm::vec3& vel)
-// {
-// 	// All hard-coded distances in this function is
-// 	// scaled to fit the setting above..
-// 	float unitScale = unitsPerMeter / 100.0f;
-// 	float veryCloseDistance = 0.005f * unitScale;
-// 	// do we need to worry?
-// 	if (collisionRecursionDepth > 5)
-// 		return pos;
-// 	// Ok, we need to worry:
-// 	collisionPackage->eVelocity = vel;
-// 	collisionPackage->eNormalizedVelocity = vel;
-// 	collisionPackage->eNormalizedVelocity.normalize();
-// 	collisionPackage->ePosition = pos;
-// 	collisionPackage->foundCollision = false;
-// 	// NOTE: Check for collision (calls the collision routines)
-// 	// Application specific!!
-//
-// 	world->checkCollision(collisionPackage);
-// 	// If no collision we just move along the eVelocity
-// 	if (collisionPackage->foundCollision == false)
-// 		return pos + vel;
-// 
-// 	// *** Collision occured ***
-// 	// The original destination point
-// 	glm::vec3 destinationPoint = pos + vel;
-// 	glm::vec3 newBasePoint = pos;
-// 	// only update if we are not already very close
-// 	// and if so we only move very close to intersection..not
-// 	// to the exact spot.
-// 	if (collisionPackage->nearestDistance >= veryCloseDistance)
-// 	{
-// 		glm::vec3 V = vel;
-// 		V.SetLength(collisionPackage->nearestDistance - veryCloseDistance);
-// 		newBasePoint = collisionPackage->ePosition + V;
-// 		// Adjust polygon intersection point (so sliding
-// 		// plane will be unaffected by the fact that we
-// 		// move slightly less than collision tells us)
-// 		V.normalize();
-// 		collisionPackage->intersectionPoint -= veryCloseDistance * V;
-// 	}
-// 	// NOTE: Determine the sliding plane
-// 	glm::vec3 slidePlaneOrigin =collisionPackage->intersectionPoint;
-// 	glm::vec3 slidePlaneNormal = newBasePoint - collisionPackage->intersectionPoint;
-// 	slidePlaneNormal.normalize();
-// 	PLANE slidingPlane(slidePlaneOrigin, slidePlaneNormal);
-// 	// Again, sorry about formatting.. but look carefully ;)
-// 	glm::vec3 newDestinationPoint = destinationPoint 
-// 		- slidingPlane.signedDistanceTo(destinationPoint) * slidePlaneNormal;
-// 	// Generate the slide vector, which will become our new
-// 	// eVelocity vector for the next iteration
-// 	glm::vec3 newVelocityVector = newDestinationPoint 
-// 		- collisionPackage->intersectionPoint;
-// 	// Recurse:
-// 	// dont recurse if the new eVelocity is very small
-// 	if (newVelocityVector.length() < veryCloseDistance)
-// 		return newBasePoint;
-// 	
-// 	collisionRecursionDepth++;
-// 	return collideWithWorld(newBasePoint, newVelocityVector);
-// }
-// 
-// void collideAndSlide(const glm::vec3& vel, const glm::vec3& gravity)
-// {
-// 	// Do collision detection:
-// 	collisionPackage->r3Position = position;
-// 	collisionPackage->r3Velocity = vel;
-// 	// calculate position and eVelocity in eSpace
-// 	glm::vec3 eSpacePosition = collisionPackage->r3Position / collisionPackage->eRadius;
-// 	glm::vec3 eSpaceVelocity = collisionPackage->r3Velocity / collisionPackage->eRadius;
-// 	// Iterate until we have our final position.
-// 	collisionRecursionDepth = 0;
-// 	glm::vec3 finalPosition = collideWithWorld(eSpacePosition, eSpaceVelocity);
-// 	// Add gravity pull:
-// 	// To remove gravity uncomment from here .....
-// 	// Set the new R3 position (convert back from eSpace to R3
-// 	collisionPackage->r3Position = finalPosition * collisionPackage->eRadius;
-// 	collisionPackage->r3Velocity = gravity;
-// 	eSpaceVelocity = gravity/collisionPackage->eRadius;
-// 	collisionRecursionDepth = 0;
-// 	finalPosition = collideWithWorld(finalPosition, eSpaceVelocity);
-// 	// ... to here
-// 	// Convert final result back to R3:
-// 	finalPosition = finalPosition * collisionPackage->eRadius;
-// 	// Move the entity (application specific function)
-// 	MoveTo(finalPosition);
-// }
-//
