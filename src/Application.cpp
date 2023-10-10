@@ -1,6 +1,6 @@
 #include "Application.hpp"
 #include "VertexArrayGenerator.hpp"
-#include <stdexcept>
+#include <memory>
 
 bool firstMouse = true;
 float lastX = 0.f;
@@ -9,7 +9,9 @@ unsigned int speedCount = 0;
 
 std::vector<Object*> StaticObjects;
 std::vector<Object*> DynamicObjects;
-static void createBall();
+
+std::shared_ptr<vag::Object> standardBallVertex;
+static void createBall(std::shared_ptr<vag::Object> vertexData);
 
 GLFWwindow* SetupContext()
 {
@@ -78,28 +80,30 @@ void CreateObject()
 {
 	std::cout << "Create objects.\n";
 	SphereFactory sphereFactory;
-	vag::Object* sphereData = sphereFactory.makeVertexData(1.f, 32.f, 32.f);
-	VAO* SphereVAO = sphereFactory.makeVAO(sphereData);
+	auto sphereData = sphereFactory.makeVertexData(1.f, 32.f, 32.f);
+	standardBallVertex = sphereData;
+
+	std::unique_ptr<VAO> SphereVAO = sphereFactory.makeVAO(sphereData);
 	unsigned int tex1 = sphereFactory.makeTexture(TEXTURES::BOX_DIFF);
 	unsigned int tex2 = sphereFactory.makeTexture(TEXTURES::BOX_SPEC);
 	unsigned int tex3 = sphereFactory.makeTexture(TEXTURES::BOX_EMIT);
 	Shader shader = sphereFactory.makeShader(SHADERS::PHONG_3_LIGHT);
 
-	CollisionComponent* colComponent = 
-		new CollisionComponent(glm::vec3(1.f), glm::vec3(10.f, -10.f, 0.f), glm::vec3(0.f, 1.f, 1.f));
-	auto sphereObj = new Object(sphereData, SphereVAO, shader, std::vector<unsigned int>{tex1, tex2, tex3});
-	sphereObj->addCollision(colComponent);
+	auto colComponent = 
+		std::make_unique<CollisionComponent>(glm::vec3(1.f), glm::vec3(10.f, -10.f, 0.f), glm::vec3(0.f, 1.f, 1.f));
+	auto sphereObj = new Object(sphereData, std::move(SphereVAO), shader, std::vector<unsigned int>{tex1, tex2, tex3});
+	sphereObj->addCollision(std::move(colComponent));
 	DynamicObjects.push_back(sphereObj);
 
 	CylinderFactory cylinderFactory;
 	// NOTE: this makeVertexData allocate memory and the Object own that memory
-	vag::Object* cylinderData = cylinderFactory.makeVertexData(30.f, 15.f, 30.f);
-	VAO* cylinderVAO = sphereFactory.makeVAO(cylinderData);
+	auto cylinderData = cylinderFactory.makeVertexData(30.f, 15.f, 30.f);
+	std::unique_ptr<VAO> cylinderVAO = sphereFactory.makeVAO(cylinderData);
 
-	CollisionComponent* nullColl = 
-		new CollisionComponent(glm::vec3(1.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 0.f, 0.f));
-	auto cylinderObj = new Object(cylinderData, cylinderVAO, shader, std::vector<unsigned int>{tex1, tex2, tex3});
-	cylinderObj->addCollision(nullColl);
+	auto nullColl = 
+		std::make_unique<CollisionComponent>(glm::vec3(1.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 0.f, 0.f));
+	auto cylinderObj = new Object(cylinderData, std::move(cylinderVAO), shader, std::vector<unsigned int>{tex1, tex2, tex3});
+	cylinderObj->addCollision(std::move(nullColl));
 	StaticObjects.push_back(cylinderObj);
 }
 
@@ -167,7 +171,7 @@ void Update()
 	}
 	speedCount += 1;
 
-	// NOTE: Collision
+	// NOTE: Collision check
 	for(const auto& dO : DynamicObjects)
 	{
 		for(const auto& sO : StaticObjects)
@@ -175,8 +179,6 @@ void Update()
 			dO->checkCollision(sO->getVertexData());
 		}
 	}
-
-	// NOTE: Move object
 }
 
 void Render(GLFWwindow* window)
@@ -249,22 +251,21 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	}
 
     if (key == GLFW_KEY_C && action == GLFW_PRESS)
-		createBall();
+		createBall(standardBallVertex);
 }
 
-static void createBall()
+static void createBall(std::shared_ptr<vag::Object> sphereData)
 {
 	SphereFactory sphereFactory;
-	vag::Object* sphereData = sphereFactory.makeVertexData(1.f, 32.f, 32.f);
-	VAO* SphereVAO = sphereFactory.makeVAO(sphereData);
+	std::unique_ptr<VAO> SphereVAO = sphereFactory.makeVAO(sphereData);
 	unsigned int tex1 = sphereFactory.makeTexture(TEXTURES::BOX_DIFF);
 	unsigned int tex2 = sphereFactory.makeTexture(TEXTURES::BOX_SPEC);
 	unsigned int tex3 = sphereFactory.makeTexture(TEXTURES::BOX_EMIT);
 	Shader shader = sphereFactory.makeShader(SHADERS::PHONG_3_LIGHT);
 
-	CollisionComponent* colComponent = 
-		new CollisionComponent(glm::vec3(1.f), glm::vec3(10.f, -10.f, 0.f), glm::vec3(0.f, 1.f, 1.f));
-	auto sphereObj = new Object(sphereData, SphereVAO, shader, std::vector<unsigned int>{tex1, tex2, tex3});
-	sphereObj->addCollision(colComponent);
+	auto colComponent = 
+		std::make_unique<CollisionComponent>(glm::vec3(1.f), glm::vec3(10.f, -10.f, 0.f), glm::vec3(0.f, 1.f, 1.f));
+	auto sphereObj = new Object(sphereData, std::move(SphereVAO), shader, std::vector<unsigned int>{tex1, tex2, tex3});
+	sphereObj->addCollision(std::move(colComponent));
 	DynamicObjects.push_back(sphereObj);
 }

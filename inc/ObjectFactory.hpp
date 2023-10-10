@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <memory>
 
 #include "Resource.hpp"
 #include "VertexArrayGenerator.hpp"
@@ -8,9 +9,9 @@
 
 class ObjectFactory{
 public:
-	virtual vag::Object* makeVertexData(float p1, float p2, float p3);
-	VAO* makeVAO(vag::Object*);
-	Shader makeShader(SHADERS s);
+	virtual std::shared_ptr<vag::Object> makeVertexData(float p1, float p2, float p3) = 0;
+	std::unique_ptr<VAO> makeVAO(std::shared_ptr<vag::Object>);
+	virtual Shader makeShader(SHADERS s);
 	unsigned int makeTexture(TEXTURES t);
 
 protected:
@@ -20,12 +21,14 @@ protected:
 class SphereFactory : public ObjectFactory{
 public:
 	SphereFactory();
-	vag::Object* makeVertexData(float p1, float p2, float p3) override;
+	std::shared_ptr<vag::Object> makeVertexData(float p1, float p2, float p3) override;
+	Shader makeShader(SHADERS s) override;
 };
 
 class CylinderFactory : public ObjectFactory{
 public:
 	CylinderFactory();
-	vag::Object* makeVertexData(float p1, float p2, float p3) override;
+	std::shared_ptr<vag::Object> makeVertexData(float p1, float p2, float p3) override;
+	Shader makeShader(SHADERS s) override;
 };
 

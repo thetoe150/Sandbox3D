@@ -1,15 +1,23 @@
 #include "Object.hpp"
 
-Object::Object(vag::Object* vertexData, VAO* VAO, Shader shader, std::vector<unsigned int> tex)
-	: m_vertexData(vertexData), m_VAO(VAO), m_shader(shader), m_textures(tex)
+// constructor
+// ----------------------------------------------------------------------------------------
+
+Object::Object(const std::shared_ptr<vag::Object>& vertexData, std::unique_ptr<VAO>&& VAO, Shader shader, std::vector<unsigned int> tex)
+	: m_vertexData(vertexData), m_VAO(std::move(VAO)), m_shader(shader), m_textures(tex)
 {
 	setup();	
 }
 
+// destructor
+// ----------------------------------------------------------------------------------------
+
 Object::~Object()
 {
-	delete this->m_vertexData;
 }
+
+// make setup
+// ----------------------------------------------------------------------------------------
 
 void Object::setup()
 {
@@ -46,6 +54,9 @@ void Object::setup()
 	m_shader.setFloat("uSpotLight.Kq", 0.002f);
 }
 
+// draw
+// ----------------------------------------------------------------------------------------
+
 void Object::draw(const Camera& camera)
 {
 	m_VAO->bind();
@@ -79,17 +90,20 @@ void Object::draw(const Camera& camera)
 	glDrawElements(GL_TRIANGLES, m_VAO->indexCount, GL_UNSIGNED_INT, (void*)0);
 }
 
-vag::Object* Object::getVertexData()
+std::shared_ptr<vag::Object> Object::getVertexData()
 {
 	return this->m_vertexData;
 }
 
-void Object::addCollision(CollisionComponent* coll)
+// collision
+// ----------------------------------------------------------------------------------------
+
+void Object::addCollision(std::unique_ptr<CollisionComponent>&& coll)
 {
-	m_collision = coll;
+	m_collision = std::move(coll);
 }
 
-void Object::checkCollision(vag::Object* data) 
+void Object::checkCollision(const std::shared_ptr<vag::Object>& data) 
 {
 	unsigned int n = data->getIndexSize() / sizeof(unsigned int);	
 	const float* vertices = data->getVertices();
@@ -124,7 +138,7 @@ void Object::checkCollision(vag::Object* data)
 		p3 /= m_collision->eRadius;
 		// std::cout << "\ncheck m_collisionlision with points: " << p1.x <<" "<<p1.y<<" "<<p1.z;
 
-		checkTriangle(m_collision, p1, p2, p3, -nor, deltaTime);
+		checkTriangle(std::move(m_collision), p1, p2, p3, -nor, deltaTime);
 	}
 
 	if(m_collision->foundCollision)

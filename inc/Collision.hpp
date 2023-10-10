@@ -1,6 +1,7 @@
 #pragma once
 
 #include "iostream"
+#include <memory>
 
 #include "glm/geometric.hpp"
 #include "glm/glm.hpp"
@@ -46,6 +47,6 @@ public:
 	glm::vec3 intersectionNormal{0};
 };
 
-void checkTriangle(CollisionComponent* colPackage, const glm::vec3& p1,
+void checkTriangle(std::unique_ptr<CollisionComponent>&& colPackage, const glm::vec3& p1,
 				   const glm::vec3& p2, const glm::vec3& p3, 
 				   const glm::vec3& normal, float deltaTime);

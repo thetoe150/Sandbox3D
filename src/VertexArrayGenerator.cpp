@@ -283,7 +283,7 @@ void vag::Mesh::setX(float x_min, float x_max)
         this->x_max = x_max;
 }
 
-void vag::Mesh::setY(float y_min, float y_may)
+void vag::Mesh::setY(float y_min, float y_max)
 {
     if(this->y_min != y_min)
         this->y_min = y_min;
