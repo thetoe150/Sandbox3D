@@ -1,4 +1,6 @@
 #include "Object.hpp"
+#include "GlobalData.hpp"
+#include "glm/ext/matrix_clip_space.hpp"
 
 // constructor
 // ----------------------------------------------------------------------------------------
@@ -6,15 +8,23 @@
 Object::Object(const std::shared_ptr<vag::Object>& vertexData, std::unique_ptr<VAO>&& VAO, Shader shader, std::vector<unsigned int> tex)
 	: m_vertexData(vertexData), m_VAO(std::move(VAO)), m_shader(shader), m_textures(tex)
 {
-	setup();	
+	setup();
+};
+
+LightSphere::LightSphere(const std::shared_ptr<vag::Object>& vertexData, std::unique_ptr<VAO>&& VAO, Shader shader, std::vector<unsigned int> tex)
+	: Object(vertexData, std::move(VAO), shader, tex)
+{
+	setup();
 }
 
 // destructor
 // ----------------------------------------------------------------------------------------
 
 Object::~Object()
-{
-}
+{}
+
+LightSphere::~LightSphere()
+{}
 
 // make setup
 // ----------------------------------------------------------------------------------------
@@ -28,12 +38,11 @@ void Object::setup()
 	m_shader.setFloat("uMaterial.shininess", 16.f);
 	m_shader.setFloat("uMaterial.brightness", 0.5f);
 
-	m_shader.setVec3("uDirLight.direction", glm::vec3(-3.0f, 0.0f, 1.0f));
-	m_shader.setVec3("uDirLight.ambient", glm::vec3(0.2f));
-	m_shader.setVec3("uDirLight.diffuse", glm::vec3(0.2f));
-	m_shader.setVec3("uDirLight.specular", glm::vec3(0.2f));
+	m_shader.setVec3("uDirLight.direction", glm::vec3(10.0f, 10.0f, 10.0f));
+	m_shader.setVec3("uDirLight.ambient", glm::vec3(0.1f));
+	m_shader.setVec3("uDirLight.diffuse", glm::vec3(0.3f));
+	m_shader.setVec3("uDirLight.specular", glm::vec3(0.3f));
 
-	m_shader.setVec3("uPointLight.position", glm::vec3(0.f, 0.0f, 0.0f));
 	m_shader.setVec3("uPointLight.ambient", glm::vec3(0.2f));
 	m_shader.setVec3("uPointLight.diffuse", glm::vec3(0.7f));
 	m_shader.setVec3("uPointLight.specular", glm::vec3(1.f));
@@ -47,11 +56,17 @@ void Object::setup()
 	m_shader.setFloat("uSpotLight.cutoff", 0.98f);
 	m_shader.setFloat("uSpotLight.outerCutoff", 0.95f);
 	m_shader.setVec3("uSpotLight.ambient", glm::vec3(0.2f));
-	m_shader.setVec3("uSpotLight.diffuse", glm::vec3(1.0f));
+	m_shader.setVec3("uSpotLight.diffuse", glm::vec3(0.7f));
 	m_shader.setVec3("uSpotLight.specular", glm::vec3(1.f));
 	m_shader.setFloat("uSpotLight.Kc", 1.0f);
 	m_shader.setFloat("uSpotLight.Kl", 0.015f);
 	m_shader.setFloat("uSpotLight.Kq", 0.002f);
+}
+
+void LightSphere::setup()
+{
+	// NOTE: no need to set up anything
+	m_shader.use();
 }
 
 // draw
@@ -80,6 +95,7 @@ void Object::draw(const Camera& camera)
 
 	m_shader.setVec3("uSpotLight.position", camera.getPosition());
 	m_shader.setVec3("uSpotLight.direction", camera.getFront());
+	m_shader.setVec3("uPointLight.position", lightPositions);
 
 	for(unsigned int i = 0; i < m_textures.size(); i++)
 	{
@@ -90,9 +106,26 @@ void Object::draw(const Camera& camera)
 	glDrawElements(GL_TRIANGLES, m_VAO->indexCount, GL_UNSIGNED_INT, (void*)0);
 }
 
-std::shared_ptr<vag::Object> Object::getVertexData()
+void LightSphere::draw(const Camera& camera)
 {
-	return this->m_vertexData;
+	m_VAO->bind();
+	m_shader.use();
+
+	glm::mat4 uModel(1.f);
+	uModel = glm::translate(uModel, m_collision->r3Position);
+	// uModel = glm::rotate(uModel, glm::radians(45.f), glm::vec3(1.0f));
+	// uModel = glm::scale(uModel, glm::vec3(1.0f));
+	
+	glm::mat4 uView = camera.getLookAtMatrix();
+	glm::mat4 uProjection = glm::perspective(glm::radians(camera.getZoom()),
+										  (float) WINDOW_WIDTH / (float) WINDOW_HEIGHT,
+											0.1f, 100.f);
+
+	m_shader.setMat4("uModel", uModel);
+	m_shader.setMat4("uView", uView);
+	m_shader.setMat4("uProjection", uProjection);
+
+	glDrawElements(GL_TRIANGLES, m_VAO->indexCount, GL_UNSIGNED_INT, (void*)0);
 }
 
 // collision
@@ -108,6 +141,11 @@ void Object::updatePosition()
 {
 	m_collision->ePosition = m_collision->ePosition + m_collision->eVelocity * deltaTime;
 	m_collision->updateR3spaceAccord();
+}
+void LightSphere::updatePosition()
+{
+	Object::updatePosition();
+	lightPositions = m_collision->r3Position;
 }
 
 // NOTE: this funciton respond for eVelocity change
@@ -197,3 +235,9 @@ void Object::getRedirectByCollision(const glm::vec3& newEvel)
 	m_collision->eNormalizedVelocity = glm::normalize(m_collision->eVelocity);
 	updatePosition();
 }
+
+std::shared_ptr<vag::Object> Object::getVertexData()
+{
+	return this->m_vertexData;
+}
+

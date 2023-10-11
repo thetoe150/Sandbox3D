@@ -51,7 +51,6 @@ struct SpotLight {
 	float Kq;
 };
 
-
 uniform Material uMaterial;
 uniform DirLight uDirLight;
 uniform PointLight uPointLight;

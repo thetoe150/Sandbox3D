@@ -1,4 +1,5 @@
 #include "Application.hpp"
+#include "ObjectFactory.hpp"
 
 bool firstMouse = true;
 float lastX = 0.f;
@@ -7,6 +8,7 @@ unsigned int speedCount = 0;
 
 std::vector<Object*> StaticObjects;
 std::vector<Object*> DynamicObjects;
+std::unique_ptr<Object> lightSphere;
 
 static void createBall();
 float LinearInterpolate(float x, float x_min, float x_max, float a, float b);
@@ -76,6 +78,16 @@ void LoadResource()
 
 void CreateObject()
 {
+	LightSphereFactory lightfactory;
+	auto lightData = lightfactory.makeVertexData(1.f, 24.f, 24.f);
+	std::unique_ptr<VAO> lightVAO = lightfactory.makeVAO(lightData);
+	Shader lightShader = lightfactory.makeShader();
+
+	lightSphere = std::make_unique<Object>(lightData, std::move(lightVAO), lightShader, std::vector<unsigned int>{});
+
+	auto lightColl = 
+		std::make_unique<CollisionComponent>(glm::vec3(3.f), glm::vec3(2.5f, 2.5f, 2.5f), glm::vec3(0.f, 0.f, 0.f));
+	lightSphere->addCollision(std::move(lightColl));
 
 	CylinderFactory cylinderFactory;
 	// NOTE: this makeVertexData allocate memory and the Object own that memory
@@ -84,7 +96,7 @@ void CreateObject()
 	unsigned int tex1 = cylinderFactory.makeTexture(TEXTURES::BOX_DIFF);
 	unsigned int tex2 = cylinderFactory.makeTexture(TEXTURES::BOX_SPEC);
 	unsigned int tex3 = cylinderFactory.makeTexture(TEXTURES::BOX_EMIT);
-	Shader shader = cylinderFactory.makeShader(SHADERS::PHONG_3_LIGHT);
+	Shader shader = cylinderFactory.makeShader();
 	std::unique_ptr<VAO> cylinderVAO = cylinderFactory.makeVAO(cylinderData);
 
 	auto nullColl = 
@@ -158,6 +170,12 @@ void Update()
 	}
 	speedCount += 1;
 
+	for(const auto& sO : StaticObjects)
+	{
+		lightSphere->checkCollision(sO, false);
+	}
+	lightSphere->updatePosition();
+
 	// NOTE: Collision check
 	for(const auto& dO : DynamicObjects)
 	{
@@ -181,6 +199,7 @@ void Render(GLFWwindow* window)
 	glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	lightSphere->draw(camera);
 
 	for(const auto& o : StaticObjects)
 	{
@@ -261,13 +280,13 @@ static void createBall()
 	if(int1 % 2 == 0)
 	{
 		SphereFactory sphereFactory;
-		float radius = LinearInterpolate(int1, 0.f, 10.f, 2.f, 5.f);
+		float radius = LinearInterpolate(int1, 0.f, 10.f, 1.f, 8.f);
 		auto sphereData = sphereFactory.makeVertexData(radius, 24.f, 24.f);
 		std::unique_ptr<VAO> SphereVAO = sphereFactory.makeVAO(sphereData);
 		unsigned int tex1 = sphereFactory.makeTexture(TEXTURES::BOX_DIFF);
 		unsigned int tex2 = sphereFactory.makeTexture(TEXTURES::BOX_SPEC);
 		unsigned int tex3 = sphereFactory.makeTexture(TEXTURES::BOX_EMIT);
-		Shader shader = sphereFactory.makeShader(SHADERS::PHONG_3_LIGHT);
+		Shader shader = sphereFactory.makeShader();
 
 		auto sphereObj = new Object(sphereData, std::move(SphereVAO), shader, std::vector<unsigned int>{tex1, tex2, tex3});
 
@@ -287,7 +306,7 @@ static void createBall()
 		unsigned int tex1 = cylinderFactory.makeTexture(TEXTURES::BOX_DIFF);
 		unsigned int tex2 = cylinderFactory.makeTexture(TEXTURES::BOX_SPEC);
 		unsigned int tex3 = cylinderFactory.makeTexture(TEXTURES::BOX_EMIT);
-		Shader shader = cylinderFactory.makeShader(SHADERS::PHONG_3_LIGHT);
+		Shader shader = cylinderFactory.makeShader();
 
 		auto cylinderObj = new Object(cylinderData, std::move(cylinderVAO), shader, std::vector<unsigned int>{tex1, tex2, tex3});
 
