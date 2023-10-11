@@ -4,10 +4,14 @@
 #include "glm/ext/matrix_clip_space.hpp"
 #include "GLFW/glfw3.h"
 
+#include <memory>
+
+#include "VertexArrayGenerator.hpp"
 #include "GlobalData.hpp"
 #include "Object.hpp"
 #include "ObjectFactory.hpp"
 #include "Collision.hpp"
+#include "Random.hpp"
 
 GLFWwindow* SetupContext();
 void LoadResource();

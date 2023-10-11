@@ -1,6 +1,4 @@
 #include "Application.hpp"
-#include "VertexArrayGenerator.hpp"
-#include <memory>
 
 bool firstMouse = true;
 float lastX = 0.f;
@@ -10,8 +8,8 @@ unsigned int speedCount = 0;
 std::vector<Object*> StaticObjects;
 std::vector<Object*> DynamicObjects;
 
-std::shared_ptr<vag::Object> standardBallVertex;
-static void createBall(std::shared_ptr<vag::Object> vertexData);
+static void createBall();
+float LinearInterpolate(float x, float x_min, float x_max, float a, float b);
 
 GLFWwindow* SetupContext()
 {
@@ -78,27 +76,16 @@ void LoadResource()
 
 void CreateObject()
 {
-	std::cout << "Create objects.\n";
-	SphereFactory sphereFactory;
-	auto sphereData = sphereFactory.makeVertexData(1.f, 32.f, 32.f);
-	standardBallVertex = sphereData;
-
-	std::unique_ptr<VAO> SphereVAO = sphereFactory.makeVAO(sphereData);
-	unsigned int tex1 = sphereFactory.makeTexture(TEXTURES::BOX_DIFF);
-	unsigned int tex2 = sphereFactory.makeTexture(TEXTURES::BOX_SPEC);
-	unsigned int tex3 = sphereFactory.makeTexture(TEXTURES::BOX_EMIT);
-	Shader shader = sphereFactory.makeShader(SHADERS::PHONG_3_LIGHT);
-
-	auto colComponent = 
-		std::make_unique<CollisionComponent>(glm::vec3(1.f), glm::vec3(10.f, -10.f, 0.f), glm::vec3(0.f, 1.f, 1.f));
-	auto sphereObj = new Object(sphereData, std::move(SphereVAO), shader, std::vector<unsigned int>{tex1, tex2, tex3});
-	sphereObj->addCollision(std::move(colComponent));
-	DynamicObjects.push_back(sphereObj);
 
 	CylinderFactory cylinderFactory;
 	// NOTE: this makeVertexData allocate memory and the Object own that memory
 	auto cylinderData = cylinderFactory.makeVertexData(30.f, 15.f, 30.f);
-	std::unique_ptr<VAO> cylinderVAO = sphereFactory.makeVAO(cylinderData);
+	std::unique_ptr<VAO> SphereVAO = cylinderFactory.makeVAO(cylinderData);
+	unsigned int tex1 = cylinderFactory.makeTexture(TEXTURES::BOX_DIFF);
+	unsigned int tex2 = cylinderFactory.makeTexture(TEXTURES::BOX_SPEC);
+	unsigned int tex3 = cylinderFactory.makeTexture(TEXTURES::BOX_EMIT);
+	Shader shader = cylinderFactory.makeShader(SHADERS::PHONG_3_LIGHT);
+	std::unique_ptr<VAO> cylinderVAO = cylinderFactory.makeVAO(cylinderData);
 
 	auto nullColl = 
 		std::make_unique<CollisionComponent>(glm::vec3(1.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 0.f, 0.f));
@@ -251,21 +238,60 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	}
 
     if (key == GLFW_KEY_C && action == GLFW_PRESS)
-		createBall(standardBallVertex);
+		createBall();
 }
 
-static void createBall(std::shared_ptr<vag::Object> sphereData)
+static void createBall()
 {
-	SphereFactory sphereFactory;
-	std::unique_ptr<VAO> SphereVAO = sphereFactory.makeVAO(sphereData);
-	unsigned int tex1 = sphereFactory.makeTexture(TEXTURES::BOX_DIFF);
-	unsigned int tex2 = sphereFactory.makeTexture(TEXTURES::BOX_SPEC);
-	unsigned int tex3 = sphereFactory.makeTexture(TEXTURES::BOX_EMIT);
-	Shader shader = sphereFactory.makeShader(SHADERS::PHONG_3_LIGHT);
+	auto rg = RandomGenerator::instance();
+	int int1 = rg->generateRandomInt();
+	int int2 = rg->generateRandomInt();
+	int int3 = rg->generateRandomInt();
 
-	auto colComponent = 
-		std::make_unique<CollisionComponent>(glm::vec3(1.f), glm::vec3(10.f, -10.f, 0.f), glm::vec3(0.f, 1.f, 1.f));
-	auto sphereObj = new Object(sphereData, std::move(SphereVAO), shader, std::vector<unsigned int>{tex1, tex2, tex3});
-	sphereObj->addCollision(std::move(colComponent));
-	DynamicObjects.push_back(sphereObj);
+	if(int1 % 2 == 0)
+	{
+		SphereFactory sphereFactory;
+		float radius = LinearInterpolate(int1, 0.f, 10.f, 0.5f, 4.f);
+		auto sphereData = sphereFactory.makeVertexData(radius, 24.f, 24.f);
+		std::unique_ptr<VAO> SphereVAO = sphereFactory.makeVAO(sphereData);
+		unsigned int tex1 = sphereFactory.makeTexture(TEXTURES::BOX_DIFF);
+		unsigned int tex2 = sphereFactory.makeTexture(TEXTURES::BOX_SPEC);
+		unsigned int tex3 = sphereFactory.makeTexture(TEXTURES::BOX_EMIT);
+		Shader shader = sphereFactory.makeShader(SHADERS::PHONG_3_LIGHT);
+
+		auto sphereObj = new Object(sphereData, std::move(SphereVAO), shader, std::vector<unsigned int>{tex1, tex2, tex3});
+
+		auto colComponent = 
+			std::make_unique<CollisionComponent>(glm::vec3(radius), glm::vec3(int1, int2, int3), glm::vec3(0.f, 1.f, 1.f));
+		sphereObj->addCollision(std::move(colComponent));
+		DynamicObjects.push_back(sphereObj);
+	}
+	else
+	{
+		CylinderFactory cylinderFactory;
+		float baseRadius = LinearInterpolate(int1, 0.f, 10.f, 0.5f, 2.f);
+		float topRadius = LinearInterpolate(int2, 0.f, 10.f, 0.5f, 2.f);
+		float height = LinearInterpolate(int3, 0.f, 10.f, 0.5f, 4.f);
+		auto cylinderData = cylinderFactory.makeVertexData(baseRadius, topRadius, height);
+		std::unique_ptr<VAO> cylinderVAO = cylinderFactory.makeVAO(cylinderData);
+		unsigned int tex1 = cylinderFactory.makeTexture(TEXTURES::BOX_DIFF);
+		unsigned int tex2 = cylinderFactory.makeTexture(TEXTURES::BOX_SPEC);
+		unsigned int tex3 = cylinderFactory.makeTexture(TEXTURES::BOX_EMIT);
+		Shader shader = cylinderFactory.makeShader(SHADERS::PHONG_3_LIGHT);
+
+		auto cylinderObj = new Object(cylinderData, std::move(cylinderVAO), shader, std::vector<unsigned int>{tex1, tex2, tex3});
+
+		auto nullColl = 
+			std::make_unique<CollisionComponent>(glm::vec3(baseRadius, baseRadius, height / 2)
+											, glm::vec3(int1, int2, int3), glm::vec3(0.f, 0.f, 0.f));
+
+		cylinderObj->addCollision(std::move(nullColl));
+		DynamicObjects.push_back(cylinderObj);
+	}
+}
+
+float LinearInterpolate(float x, float x_min, float x_max, float a, float b)
+{
+	float ratio = (b - a) / (x_max - x_min);
+	return a + (x - x_min) * ratio;
 }
