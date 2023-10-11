@@ -27,6 +27,10 @@ protected:
 	std::unique_ptr<CollisionComponent> m_collision;
 };
 
-class Ball : public Object{
-	Ball();
+class Sphere : public Object{
+	Sphere(const std::shared_ptr<vag::Object>& vertexData, std::unique_ptr<VAO>&& VAO, Shader shader, std::vector<unsigned int> tex);
+};
+
+class Cylinder : public Object{
+	Cylinder(const std::shared_ptr<vag::Object>& vertexData, std::unique_ptr<VAO>&& VAO, Shader shader, std::vector<unsigned int> tex);
 };

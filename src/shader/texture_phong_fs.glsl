@@ -147,8 +147,6 @@ vec3 calcSpotLight(SpotLight light, vec3 n, vec3 fragPos, vec3 viewPos)
 		
 		return combine * attenuation * spotlight;
 	}
-		
-
 }
 
 vec3 calcEmissionLight()

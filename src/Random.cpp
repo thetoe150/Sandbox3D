@@ -29,7 +29,7 @@ int RandomGenerator::generateRandomInt()
 	// std::random_device dev;
 	// std::mt19937 rng(dev());
 
-	std::uniform_int_distribution<std::mt19937::result_type> dist6(1,6);
+	std::uniform_int_distribution<std::mt19937::result_type> dist6(1,4);
 
 	int res = dist6(prng);
 	std::cout << "Random res:" << res << std::endl;

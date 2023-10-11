@@ -132,6 +132,9 @@ void Object::checkCollision(const std::shared_ptr<vag::Object>& data)
 		glm::vec3 nor(normals[index  ], normals[index+1], normals[index+2]);
 		//std::cout << "generated normal: " << nor.x << " " << nor.y << " " << nor.z << "\n";
 
+		// NOTE: transform to world space
+	glm::mat4 uModel(1.f);
+	uModel = glm::translate(uModel, m_collision->r3Position);
 		// NOTE: transform points to elipsoid space
 		p1 /= m_collision->eRadius;
 		p2 /= m_collision->eRadius;
