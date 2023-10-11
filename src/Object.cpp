@@ -103,13 +103,15 @@ void Object::addCollision(std::unique_ptr<CollisionComponent>&& coll)
 	m_collision = std::move(coll);
 }
 
+// NOTE: this funciton respond for ePosition change and update r3Pos and r3Vel
 void Object::updatePosition()
 {
 	m_collision->ePosition = m_collision->ePosition + m_collision->eVelocity * deltaTime;
 	m_collision->updateR3spaceAccord();
 }
 
-void Object::checkCollision(Object* targetObj) 
+// NOTE: this funciton respond for eVelocity change
+void Object::checkCollision(Object* targetObj, bool isDynamic) 
 {
 	auto data = targetObj->getVertexData();
 	unsigned int n = data->getIndexSize() / sizeof(unsigned int);	
@@ -164,8 +166,10 @@ void Object::checkCollision(Object* targetObj)
 		// std::cout << "\np1 after elipsoid transform: " << glm::to_string(p1);
 		// std::cout << "\np2 after elipsoid transform: " << glm::to_string(p2);
 		// std::cout << "\np3 after elipsoid transform: " << glm::to_string(p3);
-
-		checkTriangle(std::move(m_collision), p1, p2, p3, -nor, deltaTime);
+		if(!isDynamic)
+			checkTriangle(std::move(m_collision), p1, p2, p3, -nor, deltaTime);
+		else
+			checkTriangle(std::move(m_collision), p1, p2, p3, nor, deltaTime);
 	}
 
 	if(m_collision->foundCollision)
@@ -173,8 +177,23 @@ void Object::checkCollision(Object* targetObj)
 		//m_collision->ePosition = m_collision->intersectionPoint;
 		m_collision->eVelocity = glm::reflect(m_collision->eVelocity, m_collision->intersectionNormal);
 		m_collision->eNormalizedVelocity = glm::normalize(m_collision->eVelocity);
-		std::cout << "Hit m_collisionlision!!\n";
+		// std::cout << "Hit Collision!!\n";
+
+		if(isDynamic)
+		{
+			targetObj->getRedirectByCollision(- m_collision->eVelocity);
+			// std::cout << "Hit dynamic Collision!!\n";
+		}
+			// std::cout << "Hit static Collision!!\n";
+
 		m_collision->foundCollision = false;
 	}
 	
+}
+void Object::getRedirectByCollision(const glm::vec3& newEvel)
+{
+	// std::cout << "Get Hit by Collision!!\n";
+	m_collision->eVelocity = newEvel;
+	m_collision->eNormalizedVelocity = glm::normalize(m_collision->eVelocity);
+	updatePosition();
 }
