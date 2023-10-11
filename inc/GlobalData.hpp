@@ -1,6 +1,7 @@
 #pragma once
 
 #include "camera.hpp"
+#include <vector>
 
 // Constants 
 // --------------------------------------------------------------------------------
@@ -20,3 +21,4 @@ extern float deltaTime;
 extern float lastTime;
 
 extern Camera camera;
+extern glm::vec3 lightPositions;

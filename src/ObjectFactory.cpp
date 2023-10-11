@@ -13,23 +13,32 @@ CylinderFactory::CylinderFactory()
 	: ObjectFactory()
 {}
 
+LightSphereFactory::LightSphereFactory()
+	: ObjectFactory()
+{}
+
 // make shader
 // ----------------------------------------------------------------------------------------
 
-Shader ObjectFactory::makeShader(SHADERS s)
+Shader ObjectFactory::makeShader()
 {
-	return ShaderCollection[s];
+	return ShaderCollection[SHADERS::PHONG_3_LIGHT];
 };
 
-Shader SphereFactory::makeShader(SHADERS s)
+Shader SphereFactory::makeShader()
 {
-	return ShaderCollection[s];
+	return ShaderCollection[SHADERS::PHONG_3_LIGHT];
 };
 
-Shader CylinderFactory::makeShader(SHADERS s)
+Shader CylinderFactory::makeShader()
 {
-	return ShaderCollection[s];
+	return ShaderCollection[SHADERS::PHONG_3_LIGHT];
 };
+
+Shader LightSphereFactory::makeShader()
+{
+	return ShaderCollection[SHADERS::LIGHT_SOURCE];
+}
 
 // make texture
 // ----------------------------------------------------------------------------------------
@@ -78,4 +87,11 @@ std::shared_ptr<vag::Object> CylinderFactory::makeVertexData(float p1, float p2,
 
 	return cylinder;
 };
+
+std::shared_ptr<vag::Object> LightSphereFactory::makeVertexData(float p1, float p2, float p3)
+{
+	auto sphere = std::make_shared<vag::Sphere>(p1, (int)p2, (int)p3);
+
+	return sphere;
+}
 

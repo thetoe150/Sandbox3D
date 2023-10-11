@@ -15,9 +15,9 @@ public:
 	virtual void setup();
 	virtual void draw(const Camera& camera);
 
+	virtual void updatePosition();
 	void addCollision(std::unique_ptr<CollisionComponent>&&);
 	std::shared_ptr<vag::Object> getVertexData();
-	void updatePosition();
 	void checkCollision(Object* data, bool isDynamic);
 	void getRedirectByCollision(const glm::vec3&);
 
@@ -29,10 +29,10 @@ protected:
 	std::vector<unsigned int> m_textures;
 };
 
-class Sphere : public Object{
-	Sphere(const std::shared_ptr<vag::Object>& vertexData, std::unique_ptr<VAO>&& VAO, Shader shader, std::vector<unsigned int> tex);
-};
-
-class Cylinder : public Object{
-	Cylinder(const std::shared_ptr<vag::Object>& vertexData, std::unique_ptr<VAO>&& VAO, Shader shader, std::vector<unsigned int> tex);
+class LightSphere : public Object{
+	LightSphere(const std::shared_ptr<vag::Object>& vertexData, std::unique_ptr<VAO>&& VAO, Shader shader, std::vector<unsigned int> tex);
+	~LightSphere();
+	void setup() override;
+	void draw(const Camera& camera) override;
+	void updatePosition() override;
 };

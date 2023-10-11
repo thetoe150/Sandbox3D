@@ -14,6 +14,7 @@ enum class SHADERS{
 	PHONG_3_LIGHT,
 	PHONG_1_LIGHT,
 	COLOR_LIGHT,
+	LIGHT_SOURCE
 };
 
 extern std::unordered_map<SHADERS, Shader> ShaderCollection;

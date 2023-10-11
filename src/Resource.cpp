@@ -9,9 +9,12 @@ void LoadAllShader()
 					"D:/PP/Sandbox/src/shader/color_phong_fs.glsl");
 	Shader textureShader("D:/PP/Sandbox/src/shader/texture_phong_vs.glsl", 
 					  "D:/PP/Sandbox/src/shader/texture_phong_fs.glsl");
+	Shader lightSrcShader("D:/PP/Sandbox/src/shader/light_source_vs.glsl", 
+					  "D:/PP/Sandbox/src/shader/light_source_fs.glsl");
 
 	ShaderCollection[SHADERS::PHONG_3_LIGHT] = textureShader;
 	ShaderCollection[SHADERS::COLOR_LIGHT] = colorShader;
+	ShaderCollection[SHADERS::LIGHT_SOURCE] = lightSrcShader;
 }
 
 void LoadAllTexture()

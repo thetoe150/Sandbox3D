@@ -7,6 +7,7 @@ float deltaTime = 0.f;
 float lastTime = 0.f;
 
 Camera camera;
+glm::vec3 lightPositions;
 
 const float triangle[] = {
 	// positions          // color           // normal
