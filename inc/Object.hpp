@@ -17,14 +17,15 @@ public:
 
 	void addCollision(std::unique_ptr<CollisionComponent>&&);
 	std::shared_ptr<vag::Object> getVertexData();
-	void checkCollision(const std::shared_ptr<vag::Object>& data);
+	void updatePosition();
+	void checkCollision(Object* data);
 
-protected:
 	std::shared_ptr<vag::Object> m_vertexData;
+	std::unique_ptr<CollisionComponent> m_collision;
+protected:
 	std::unique_ptr<VAO> m_VAO;
 	Shader m_shader;
 	std::vector<unsigned int> m_textures;
-	std::unique_ptr<CollisionComponent> m_collision;
 };
 
 class Sphere : public Object{
