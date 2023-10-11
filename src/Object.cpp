@@ -103,8 +103,15 @@ void Object::addCollision(std::unique_ptr<CollisionComponent>&& coll)
 	m_collision = std::move(coll);
 }
 
-void Object::checkCollision(const std::shared_ptr<vag::Object>& data) 
+void Object::updatePosition()
 {
+	m_collision->ePosition = m_collision->ePosition + m_collision->eVelocity * deltaTime;
+	m_collision->updateR3spaceAccord();
+}
+
+void Object::checkCollision(Object* targetObj) 
+{
+	auto data = targetObj->getVertexData();
 	unsigned int n = data->getIndexSize() / sizeof(unsigned int);	
 	const float* vertices = data->getVertices();
 	const unsigned int* indices = data->getIndices();
@@ -131,15 +138,32 @@ void Object::checkCollision(const std::shared_ptr<vag::Object>& data)
 
 		glm::vec3 nor(normals[index  ], normals[index+1], normals[index+2]);
 		//std::cout << "generated normal: " << nor.x << " " << nor.y << " " << nor.z << "\n";
+		// std::cout << "\np1 original: " << glm::to_string(p1);
+		// std::cout << "\np2 original: " << glm::to_string(p2);
+		// std::cout << "\np3 original: " << glm::to_string(p3);
 
 		// NOTE: transform to world space
-	glm::mat4 uModel(1.f);
-	uModel = glm::translate(uModel, m_collision->r3Position);
+		glm::mat4 uModel(1.f);
+		uModel = glm::translate(uModel, targetObj->m_collision->r3Position);
+		// std::cout << "\nm_collision->r3Position: " << glm::to_string(m_collision->r3Position);
+		// std::cout << "\nuModel: " << glm::to_string(uModel);
+		glm::vec4 p1_world = uModel * glm::vec4(p1.x, p1.y, p1.z, 1.f);
+		glm::vec4 p2_world = uModel * glm::vec4(p2.x, p2.y, p2.z, 1.f);
+		glm::vec4 p3_world = uModel * glm::vec4(p3.x, p3.y, p3.z, 1.f);
+		p1 = glm::vec3(p1_world.x, p1_world.y, p1_world.z);
+		p2 = glm::vec3(p2_world.x, p2_world.y, p2_world.z);
+		p3 = glm::vec3(p3_world.x, p3_world.y, p3_world.z);
+
+		// std::cout << "\np1 after world transform: " << glm::to_string(p1);
+		// std::cout << "\np2 after world transform: " << glm::to_string(p2);
+		// std::cout << "\np3 after world transform: " << glm::to_string(p3);
 		// NOTE: transform points to elipsoid space
 		p1 /= m_collision->eRadius;
 		p2 /= m_collision->eRadius;
 		p3 /= m_collision->eRadius;
-		// std::cout << "\ncheck m_collisionlision with points: " << p1.x <<" "<<p1.y<<" "<<p1.z;
+		// std::cout << "\np1 after elipsoid transform: " << glm::to_string(p1);
+		// std::cout << "\np2 after elipsoid transform: " << glm::to_string(p2);
+		// std::cout << "\np3 after elipsoid transform: " << glm::to_string(p3);
 
 		checkTriangle(std::move(m_collision), p1, p2, p3, -nor, deltaTime);
 	}
@@ -149,12 +173,8 @@ void Object::checkCollision(const std::shared_ptr<vag::Object>& data)
 		//m_collision->ePosition = m_collision->intersectionPoint;
 		m_collision->eVelocity = glm::reflect(m_collision->eVelocity, m_collision->intersectionNormal);
 		m_collision->eNormalizedVelocity = glm::normalize(m_collision->eVelocity);
-		// std::cout << "Hit m_collisionlision!!\n";
+		std::cout << "Hit m_collisionlision!!\n";
 		m_collision->foundCollision = false;
 	}
-	else
-	{
-		m_collision->ePosition = m_collision->ePosition + m_collision->eVelocity * deltaTime;
-	}
-	m_collision->updateR3spaceAccord();
+	
 }

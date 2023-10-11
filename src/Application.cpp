@@ -163,8 +163,16 @@ void Update()
 	{
 		for(const auto& sO : StaticObjects)
 		{
-			dO->checkCollision(sO->getVertexData());
+			dO->checkCollision(sO);
 		}
+
+		for(const auto& dO_other : DynamicObjects)
+		{
+			if(dO != dO_other)
+				dO->checkCollision(dO_other);
+		}
+
+		dO->updatePosition();
 	}
 }
 
