@@ -93,15 +93,13 @@ void CreateObject()
 	// NOTE: this makeVertexData allocate memory and the Object own that memory
 	auto cylinderData = cylinderFactory.makeVertexData(10.f, 40.f, 25.f);
 	std::unique_ptr<VAO> SphereVAO = cylinderFactory.makeVAO(cylinderData);
-	unsigned int tex1 = cylinderFactory.makeTexture(TEXTURES::BOX_DIFF);
-	unsigned int tex2 = cylinderFactory.makeTexture(TEXTURES::BOX_SPEC);
-	unsigned int tex3 = cylinderFactory.makeTexture(TEXTURES::BOX_EMIT);
+	auto tex = cylinderFactory.makeTexture(TEXTURES::BOX_DIFF);
 	Shader shader = cylinderFactory.makeShader();
 	std::unique_ptr<VAO> cylinderVAO = cylinderFactory.makeVAO(cylinderData);
 
 	auto nullColl = 
 		std::make_unique<CollisionComponent>(glm::vec3(1.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 0.f, 0.f));
-	auto cylinderObj = new Object(cylinderData, std::move(cylinderVAO), shader, std::vector<unsigned int>{tex1, tex2, tex3});
+	auto cylinderObj = new Object(cylinderData, std::move(cylinderVAO), shader, tex);
 	cylinderObj->addCollision(std::move(nullColl));
 	StaticObjects.push_back(cylinderObj);
 }
@@ -283,12 +281,19 @@ static void createBall()
 		float radius = LinearInterpolate(int1, 0.f, 10.f, 1.f, 8.f);
 		auto sphereData = sphereFactory.makeVertexData(radius, 24.f, 24.f);
 		std::unique_ptr<VAO> SphereVAO = sphereFactory.makeVAO(sphereData);
-		unsigned int tex1 = sphereFactory.makeTexture(TEXTURES::BOX_DIFF);
-		unsigned int tex2 = sphereFactory.makeTexture(TEXTURES::BOX_SPEC);
-		unsigned int tex3 = sphereFactory.makeTexture(TEXTURES::BOX_EMIT);
+		std::vector<unsigned int> tex;
+		if(int3 % 4 == 0)
+			tex = sphereFactory.makeTexture(TEXTURES::BASKET_BALL);
+		else if(int3 % 4 == 1)
+			tex = sphereFactory.makeTexture(TEXTURES::SALUTE);
+		else if(int3 % 4 == 2)
+			tex = sphereFactory.makeTexture(TEXTURES::NERDING);
+		else
+			tex = sphereFactory.makeTexture(TEXTURES::MOON);
+
 		Shader shader = sphereFactory.makeShader();
 
-		auto sphereObj = new Object(sphereData, std::move(SphereVAO), shader, std::vector<unsigned int>{tex1, tex2, tex3});
+		auto sphereObj = new Object(sphereData, std::move(SphereVAO), shader, tex);
 
 		auto colComponent = 
 			std::make_unique<CollisionComponent>(glm::vec3(radius), glm::vec3(int1, int2, int3) * velocity, glm::vec3(0.f, 1.f, 1.f));
@@ -303,12 +308,18 @@ static void createBall()
 		float height = LinearInterpolate(int3, 0.f, 10.f, 3.f, 7.f);
 		auto cylinderData = cylinderFactory.makeVertexData(baseRadius, topRadius, height);
 		std::unique_ptr<VAO> cylinderVAO = cylinderFactory.makeVAO(cylinderData);
-		unsigned int tex1 = cylinderFactory.makeTexture(TEXTURES::BOX_DIFF);
-		unsigned int tex2 = cylinderFactory.makeTexture(TEXTURES::BOX_SPEC);
-		unsigned int tex3 = cylinderFactory.makeTexture(TEXTURES::BOX_EMIT);
+		std::vector<unsigned int> tex;
+		if(int3 % 4 == 0)
+			tex = cylinderFactory.makeTexture(TEXTURES::BASKET_BALL);
+		else if(int3 % 4 == 1)
+			tex = cylinderFactory.makeTexture(TEXTURES::SALUTE);
+		else if(int3 % 4 == 2)
+			tex = cylinderFactory.makeTexture(TEXTURES::NERDING);
+		else
+			tex = cylinderFactory.makeTexture(TEXTURES::MOON);
 		Shader shader = cylinderFactory.makeShader();
 
-		auto cylinderObj = new Object(cylinderData, std::move(cylinderVAO), shader, std::vector<unsigned int>{tex1, tex2, tex3});
+		auto cylinderObj = new Object(cylinderData, std::move(cylinderVAO), shader, tex);
 
 		float radius = topRadius;
 		if(baseRadius > topRadius)

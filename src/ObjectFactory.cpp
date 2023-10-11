@@ -1,4 +1,5 @@
 #include "ObjectFactory.hpp"
+#include "Resource.hpp"
 #include "VertexArrayGenerator.hpp"
 #include <algorithm>
 #include <memory>
@@ -43,9 +44,40 @@ Shader LightSphereFactory::makeShader()
 // make texture
 // ----------------------------------------------------------------------------------------
 
-unsigned int ObjectFactory::makeTexture(TEXTURES t)
+std::vector<unsigned int> ObjectFactory::makeTexture(TEXTURES t)
 {
-	return TextureCollection[t];
+	std::vector<unsigned int> res;
+	if(t == TEXTURES::BOX_DIFF)
+	{
+		res.push_back(TextureCollection[TEXTURES::BOX_DIFF]);
+		res.push_back(TextureCollection[TEXTURES::BOX_SPEC]);
+		res.push_back(TextureCollection[TEXTURES::BOX_EMIT]);
+	}
+	else if(t == TEXTURES::SALUTE)
+	{
+		res.push_back(TextureCollection[TEXTURES::SALUTE]);
+		res.push_back(TextureCollection[TEXTURES::BOX_SPEC]);
+		res.push_back(TextureCollection[TEXTURES::BOX_EMIT]);
+	}
+	else if(t == TEXTURES::NERDING)
+	{
+		res.push_back(TextureCollection[TEXTURES::NERDING]);
+		res.push_back(TextureCollection[TEXTURES::BOX_SPEC]);
+		res.push_back(TextureCollection[TEXTURES::BOX_EMIT]);
+	}
+	else if(t == TEXTURES::MOON)
+	{
+		res.push_back(TextureCollection[TEXTURES::MOON]);
+		res.push_back(TextureCollection[TEXTURES::BOX_SPEC]);
+		res.push_back(TextureCollection[TEXTURES::BOX_EMIT]);
+	}
+	else
+	{
+		res.push_back(TextureCollection[TEXTURES::BASKET_BALL]);
+		res.push_back(TextureCollection[TEXTURES::BOX_SPEC]);
+		res.push_back(TextureCollection[TEXTURES::BOX_EMIT]);
+	}
+	return res;
 };
 
 // make VAO

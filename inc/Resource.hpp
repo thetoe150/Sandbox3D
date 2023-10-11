@@ -22,7 +22,11 @@ extern std::unordered_map<SHADERS, Shader> ShaderCollection;
 enum class TEXTURES{
 	BOX_DIFF,
 	BOX_SPEC,
-	BOX_EMIT
+	BOX_EMIT,
+	BASKET_BALL,
+	SALUTE,
+	NERDING,
+	MOON
 };
 
 extern std::unordered_map<TEXTURES, unsigned int> TextureCollection;
