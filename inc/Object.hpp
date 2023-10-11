@@ -18,7 +18,8 @@ public:
 	void addCollision(std::unique_ptr<CollisionComponent>&&);
 	std::shared_ptr<vag::Object> getVertexData();
 	void updatePosition();
-	void checkCollision(Object* data);
+	void checkCollision(Object* data, bool isDynamic);
+	void getRedirectByCollision(const glm::vec3&);
 
 	std::shared_ptr<vag::Object> m_vertexData;
 	std::unique_ptr<CollisionComponent> m_collision;
