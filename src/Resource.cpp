@@ -1,20 +1,27 @@
 #include "Resource.hpp"
 
-std::unordered_map<SHADERS, Shader> ShaderCollection{0};
+std::unordered_map<SHADERS, Shader*> ShaderCollection{0};
 std::unordered_map<TEXTURES, unsigned int> TextureCollection{0};
 
 void LoadAllShader()
 {
-	Shader colorShader("D:/PP/Sandbox/src/shader/color_phong_vs.glsl", 
-					"D:/PP/Sandbox/src/shader/color_phong_fs.glsl");
-	Shader textureShader("D:/PP/Sandbox/src/shader/texture_phong_vs.glsl", 
-					  "D:/PP/Sandbox/src/shader/texture_phong_fs.glsl");
-	Shader lightSrcShader("D:/PP/Sandbox/src/shader/light_source_vs.glsl", 
-					  "D:/PP/Sandbox/src/shader/light_source_fs.glsl");
+	Shader* colorShader = new Shader("D:/PP/Sandbox/src/shader/color_phong_vs.glsl", 
+									"D:/PP/Sandbox/src/shader/color_phong_fs.glsl");
+	Shader* textureShader = new Shader("D:/PP/Sandbox/src/shader/texture_phong_vs.glsl", 
+									  "D:/PP/Sandbox/src/shader/texture_phong_fs.glsl");
+	Shader* lightSrcShader = new Shader("D:/PP/Sandbox/src/shader/light_source_vs.glsl", 
+									  "D:/PP/Sandbox/src/shader/light_source_fs.glsl");
+
+	// Shader* terrainShader = new FullShader("D:/PP/Sandbox/src/shader/terrain_vs.glsl",
+	// 						"D:/PP/Sandbox/src/shader/terrain_tcs.glsl",
+	// 						"D:/PP/Sandbox/src/shader/terrain_tes.glsl",
+	// 						 nullptr,
+	// 						"D:/PP/Sandbox/src/shader/terrain_fs.glsl");
 
 	ShaderCollection[SHADERS::PHONG_3_LIGHT] = textureShader;
 	ShaderCollection[SHADERS::COLOR_LIGHT] = colorShader;
 	ShaderCollection[SHADERS::LIGHT_SOURCE] = lightSrcShader;
+	//ShaderCollection[SHADERS::TERRAIN] = terrainShader;
 }
 
 void LoadAllTexture()
