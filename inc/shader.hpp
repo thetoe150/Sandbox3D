@@ -156,16 +156,16 @@ public:
     }
 	
 protected:
-	void checkCompileErrors(GLuint shader, std::string type, const char* Path)
+	void checkCompileErrors(GLuint object, std::string type, const char* Path)
 	{
 		GLint success = -1;
 		GLchar infoLog[1024];
 		if(type != "PROGRAM")
 		{
-			glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+			glGetShaderiv(object, GL_COMPILE_STATUS, &success);
 			if(!success)
 			{
-				glGetShaderInfoLog(shader, 1024, NULL, infoLog);
+				glGetShaderInfoLog(object, 1024, NULL, infoLog);
 				std::cout << "ERROR::SHADER_COMPILATION_ERROR from shader: " << 
 				Path <<" of type: " << type << "\n" << infoLog << 
 				"\n ---------------------------------------------" << std::endl;
@@ -173,10 +173,10 @@ protected:
 		}
 		else
 		{
-			glGetShaderiv(shader, GL_LINK_STATUS, &success);
+			glGetProgramiv(object, GL_LINK_STATUS, &success);
 			if(!success)
 			{
-				glGetShaderInfoLog(shader, 1024, NULL, infoLog);
+				glGetShaderInfoLog(object, 1024, NULL, infoLog);
 				std::cout << "ERROR::SHADER_LINK_ERROR of type: " << 
 				type << "\n" << infoLog << 
 				"\n ---------------------------------------------" << std::endl;
@@ -233,4 +233,140 @@ public:
 		glDispatchCompute(x, y, z);
 		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 	}
+};
+
+class FullShader : public Shader{
+public:
+	FullShader(const char* vsPath, const char* tcsPath, const char* tesPath,
+				const char* gsPath, const char* fsPath)
+	{
+		std::string vShaderStr;
+		std::string tcShaderStr;
+		std::string teShaderStr;
+		std::string gShaderStr;
+		std::string fShaderStr;
+		std::ifstream vShaderFile;
+		std::ifstream tcShaderFile;
+		std::ifstream teShaderFile;
+		std::ifstream gShaderFile;
+		std::ifstream fShaderFile;
+		vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+		tcShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+		teShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+		gShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+		fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+		try
+		{
+			// vertex shader
+			vShaderFile.open(vsPath, std::fstream::in);
+			std::stringstream vShaderStream;
+			vShaderStream << vShaderFile.rdbuf();
+			vShaderFile.close();
+			vShaderStr = vShaderStream.str();
+
+			// tessellation shader
+			if(tesPath != nullptr)
+			{
+				// tessellation control shader
+				tcShaderFile.open(tcsPath, std::fstream::in);
+				std::stringstream tcShaderStream;
+				tcShaderStream << tcShaderFile.rdbuf();
+				tcShaderFile.close();
+				tcShaderStr = tcShaderStream.str();
+
+				// tessellation evaluation shader
+				teShaderFile.open(tesPath, std::fstream::in);
+				std::stringstream teShaderStream;
+				teShaderStream << teShaderFile.rdbuf();
+				teShaderFile.close();
+				teShaderStr = teShaderStream.str();
+			}
+
+			// geometry shader
+			if(gsPath != nullptr)
+			{
+				gShaderFile.open(gsPath, std::fstream::in);
+				std::stringstream gShaderStream;
+				gShaderStream << gShaderFile.rdbuf();
+				gShaderFile.close();
+				gShaderStr = gShaderStream.str();
+			}
+
+			// fragment shader
+			fShaderFile.open(fsPath, std::fstream::in);
+			std::stringstream fShaderStream;
+			fShaderStream << fShaderFile.rdbuf();
+			fShaderFile.close();
+			fShaderStr = fShaderStream.str();
+		}
+		catch(std::ifstream::failure& e)
+		{
+			std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << std::endl;
+		}
+
+		GLuint vShaderID;
+		GLuint tcShaderID;
+		GLuint teShaderID;
+		GLuint fShaderID;
+		GLuint gShaderID;
+		try
+		{
+			this->ID = glCreateProgram();
+
+			vShaderID = glCreateShader(GL_VERTEX_SHADER);
+			const char* vShaderCode = vShaderStr.c_str();
+			glShaderSource(vShaderID, 1, &vShaderCode, NULL);
+			glCompileShader(vShaderID);
+			checkCompileErrors(vShaderID, "FRAGMENT", vsPath);
+			glAttachShader(this->ID, vShaderID);
+
+			if(tesPath != nullptr)
+			{
+				tcShaderID = glCreateShader(GL_TESS_CONTROL_SHADER);
+				const char* tcShaderCode = tcShaderStr.c_str();
+				glShaderSource(tcShaderID, 1, &tcShaderCode, NULL);
+				glCompileShader(tcShaderID);
+				checkCompileErrors(tcShaderID, "TESSELLATION_CONTROL", tcsPath);
+				glAttachShader(this->ID, tcShaderID);
+
+				teShaderID = glCreateShader(GL_TESS_EVALUATION_SHADER);
+				const char* teShaderCode = teShaderStr.c_str();
+				glShaderSource(teShaderID, 1, &teShaderCode, NULL);
+				glCompileShader(teShaderID);
+				checkCompileErrors(teShaderID, "TESSELLATION_EVALUATION", tesPath);
+				glAttachShader(this->ID, teShaderID);
+			}
+
+			if(gsPath != nullptr)
+			{
+				gShaderID = glCreateShader(GL_GEOMETRY_SHADER);
+				const char* gShaderCode = gShaderStr.c_str();
+				glShaderSource(gShaderID, 1, &gShaderCode, NULL);
+				glCompileShader(gShaderID);
+				checkCompileErrors(gShaderID, "GEOMETRY", gsPath);
+				glAttachShader(this->ID, gShaderID);
+			}
+
+			fShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+			const char* fShaderCode = fShaderStr.c_str();
+			glShaderSource(fShaderID, 1, &fShaderCode, NULL);
+			glCompileShader(fShaderID);
+			checkCompileErrors(fShaderID, "FRAGMENT", fsPath);
+			glAttachShader(this->ID, fShaderID);
+
+			glLinkProgram(this->ID);
+			checkCompileErrors(this->ID, "PROGRAM", NULL);
+		}
+		catch(std::exception& e)
+		{
+			std::cout << "ERROR::SHADER::COMPILE_SHADER_NOT_SUCCESSFULLY: " << e.what() << std::endl;
+		}
+
+		glDeleteShader(vShaderID);
+		glDeleteShader(tcShaderID);
+		glDeleteShader(teShaderID);
+		glDeleteShader(gShaderID);
+		glDeleteShader(fShaderID);
+	}
+
 };

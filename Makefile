@@ -1,6 +1,6 @@
 CC=g++
-CFLAGS=-Wall -ggdb -std=c++17 -Iinc
-LFLAGS=-Wall -ggdb -std=c++17 -Llib -lglfw3dll -lassimp
+CFLAGS=-Wall -std=c++17 -Iinc
+LFLAGS=-Wall -std=c++17 -Llib -lglfw3dll -lassimp
 
 EXE=bin/main
 
@@ -12,6 +12,12 @@ HEADER_ONLY_FILES=inc/shader.hpp inc/camera.hpp inc/VAO.hpp  \
 
 all: $(EXE)
 	./$(EXE)
+
+debug: CFLAGS += -DDEBUG -O0 -ggdb
+debug: LFLAGS += -DDEBUG -O0 -ggdb
+debug: $(EXE)
+	./$(EXE)
+
 
 $(EXE): $(OBJ_FILES) obj/glad.o
 	$(CC) $^ -o $@ $(LFLAGS)
@@ -26,5 +32,4 @@ obj/glad.o: src/glad.cpp inc/glad/glad.h
 	$(CC) -c $< -o $@ $(CFLAGS)
 
 clean: obj/ bin/
-	rm -rf obj/
-	rm -rf bin/
+	Remove-Item -Path D:\PP\Sandbox\obj\*.*
