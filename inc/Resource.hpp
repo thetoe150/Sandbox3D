@@ -14,10 +14,11 @@ enum class SHADERS{
 	PHONG_3_LIGHT,
 	PHONG_1_LIGHT,
 	COLOR_LIGHT,
-	LIGHT_SOURCE
+	LIGHT_SOURCE,
+	TERRAIN
 };
 
-extern std::unordered_map<SHADERS, Shader> ShaderCollection;
+extern std::unordered_map<SHADERS, Shader*> ShaderCollection;
 
 enum class TEXTURES{
 	BOX_DIFF,
