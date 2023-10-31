@@ -1,3 +1,4 @@
 -Iinc
 -Iinc/GLFW
 -Iinc/glad
+-std=c++17
