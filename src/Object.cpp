@@ -241,3 +241,73 @@ std::shared_ptr<vag::Object> Object::getVertexData()
 	return this->m_vertexData;
 }
 
+
+TessTerrain::TessTerrain(TexInfo tex, FullShader shader)
+	: m_tex(tex), m_shader(shader), m_rez(20)
+{
+	setup();
+}
+
+void TessTerrain::setup()
+{
+	m_shader.use();
+	m_shader.setInt("heightMap", 0);
+
+    // set up vertex data (and buffer(s)) and configure vertex attributes
+    // ------------------------------------------------------------------
+    std::vector<float> vertices;
+
+    
+    for(unsigned i = 0; i <= m_rez-1; i++)
+    {
+        for(unsigned j = 0; j <= m_rez-1; j++)
+        {
+            vertices.push_back(-m_tex.width/2.0f + m_tex.width*i/(float)m_rez); // v.x
+            vertices.push_back(0.0f); // v.y
+            vertices.push_back(-m_tex.height/2.0f + m_tex.height*j/(float)m_rez); // v.z
+            vertices.push_back(i / (float)m_rez); // u
+            vertices.push_back(j / (float)m_rez); // v
+
+            vertices.push_back(-m_tex.width/2.0f + m_tex.width*(i+1)/(float)m_rez); // v.x
+            vertices.push_back(0.0f); // v.y
+            vertices.push_back(-m_tex.height/2.0f + m_tex.height*j/(float)m_rez); // v.z
+            vertices.push_back((i+1) / (float)m_rez); // u
+            vertices.push_back(j / (float)m_rez); // v
+
+            vertices.push_back(-m_tex.width/2.0f + m_tex.width*i/(float)m_rez); // v.x
+            vertices.push_back(0.0f); // v.y
+            vertices.push_back(-m_tex.height/2.0f + m_tex.height*(j+1)/(float)m_rez); // v.z
+            vertices.push_back(i / (float)m_rez); // u
+            vertices.push_back((j+1) / (float)m_rez); // v
+
+            vertices.push_back(-m_tex.width/2.0f + m_tex.width*(i+1)/(float)m_rez); // v.x
+            vertices.push_back(0.0f); // v.y
+            vertices.push_back(-m_tex.height/2.0f + m_tex.height*(j+1)/(float)m_rez); // v.z
+            vertices.push_back((i+1) / (float)m_rez); // u
+            vertices.push_back((j+1) / (float)m_rez); // v
+        }
+    }
+    std::cout << "Loaded " << m_rez * m_rez << " patches of 4 control points each" << std::endl;
+    std::cout << "Processing " << m_rez * m_rez * 4 << " vertices in vertex shader" << std::endl;
+
+	VAO temp(vertices.data(), sizeof(float) * vertices.size(), 3, 2, 0);
+	m_vao = temp;
+}
+void TessTerrain::draw()
+{
+	m_shader.use();
+	glm::mat4 model = glm::mat4(1.0f);
+	m_shader.setMat4("uModel", model);
+	glm::mat4 view = camera.getLookAtMatrix();
+	m_shader.setMat4("uView", view);
+	glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), 
+								(float) WINDOW_WIDTH / (float)WINDOW_HEIGHT,
+								0.1f, 1000.f);
+	m_shader.setMat4("uProjection", projection);
+	// render the terrain
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_tex.texID); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+	m_vao.bind();
+	glPatchParameteri(GL_PATCH_VERTICES, 4);
+	glDrawArrays(GL_PATCHES, 0, 4 * m_rez * m_rez);
+}

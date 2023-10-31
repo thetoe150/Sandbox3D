@@ -1,4 +1,5 @@
 #include "Application.hpp"
+#include "Object.hpp"
 #include "ObjectFactory.hpp"
 
 bool firstMouse = true;
@@ -8,7 +9,8 @@ unsigned int speedCount = 0;
 
 std::vector<Object*> StaticObjects;
 std::vector<Object*> DynamicObjects;
-std::unique_ptr<Object> lightSphere;
+std::vector<Object*> LightObjects;
+TessTerrain* terrain;
 
 static void createBall();
 float LinearInterpolate(float x, float x_min, float x_max, float a, float b);
@@ -101,17 +103,23 @@ void LoadResource()
 void CreateObject()
 {
 	std::cout << "-------------------- Initialize screen object.--------------------\n";
+	// Light object
+	// -------------------------------------------------------------------------
 	LightSphereFactory lightfactory;
 	auto lightData				  = lightfactory.makeVertexData(1.f, 24.f, 24.f);
 	std::unique_ptr<VAO> lightVAO = lightfactory.makeVAO(lightData);
 	Shader lightShader			  = lightfactory.makeShader();
 
-	lightSphere = std::make_unique<Object>(lightData, std::move(lightVAO), lightShader, std::vector<unsigned int>{});
+	auto lightSphere = new Object(lightData, std::move(lightVAO), lightShader, std::vector<unsigned int>{});
 
 	auto lightColl = 
 		std::make_unique<CollisionComponent>(glm::vec3(3.f), glm::vec3(2.5f, 2.5f, 2.5f), glm::vec3(0.f, 0.f, 0.f));
 	lightSphere->addCollision(std::move(lightColl));
 
+	LightObjects.push_back(std::move(lightSphere));
+
+	// Static object
+	// -------------------------------------------------------------------------
 	CylinderFactory cylinderFactory;
 	// NOTE: this makeVertexData allocate memory and the Object own that memory
 	auto cylinderData			     = cylinderFactory.makeVertexData(10.f, 40.f, 25.f);
@@ -125,6 +133,7 @@ void CreateObject()
 	cylinderObj->addCollision(std::move(nullColl));
 	StaticObjects.push_back(cylinderObj);
 
+	terrain = new TessTerrain(terrainTexture, FullShaderCollection[FULL_SHADERS::TERRAIN]);
 }
 
 void ProcessInput(GLFWwindow* window)
@@ -191,11 +200,14 @@ void Update()
 	}
 	speedCount += 1;
 
-	for(const auto& sO : StaticObjects)
+	for(const auto& lO : LightObjects)
 	{
-		lightSphere->checkCollision(sO, false);
+		for(const auto& sO : StaticObjects)
+		{
+			lO->checkCollision(sO, false);
+		}
+		lO->updatePosition();
 	}
-	lightSphere->updatePosition();
 
 	// NOTE: Collision check
 	for(const auto& dO : DynamicObjects)
@@ -217,7 +229,15 @@ void Update()
 
 void Render(GLFWwindow* window)
 {
-	lightSphere->draw(camera);
+	glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	terrain->draw();
+
+	for(const auto& o : LightObjects)
+	{
+		o->draw(camera);
+	}
 
 	for(const auto& o : StaticObjects)
 	{
@@ -231,7 +251,6 @@ void Render(GLFWwindow* window)
 	
 	//modelShader.setMat4("model", model);
 	//backpack.draw(modelShader);
-	
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();

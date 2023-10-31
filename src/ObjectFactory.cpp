@@ -23,22 +23,22 @@ LightSphereFactory::LightSphereFactory()
 
 Shader ObjectFactory::makeShader()
 {
-	return *ShaderCollection[SHADERS::PHONG_3_LIGHT];
+	return ShaderCollection[SHADERS::PHONG_3_LIGHT];
 };
 
 Shader SphereFactory::makeShader()
 {
-	return *ShaderCollection[SHADERS::PHONG_3_LIGHT];
+	return ShaderCollection[SHADERS::PHONG_3_LIGHT];
 };
 
 Shader CylinderFactory::makeShader()
 {
-	return *ShaderCollection[SHADERS::PHONG_3_LIGHT];
+	return ShaderCollection[SHADERS::PHONG_3_LIGHT];
 };
 
 Shader LightSphereFactory::makeShader()
 {
-	return *ShaderCollection[SHADERS::LIGHT_SOURCE];
+	return ShaderCollection[SHADERS::LIGHT_SOURCE];
 }
 
 // make texture

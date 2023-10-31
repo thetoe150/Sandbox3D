@@ -25,4 +25,4 @@ static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity
-								   , GLsizei length, const char* message, const void* userParam);
+								   ,GLsizei length, const char* message, const void* userParam);

@@ -237,6 +237,7 @@ public:
 
 class FullShader : public Shader{
 public:
+	FullShader(){};
 	FullShader(const char* vsPath, const char* tcsPath, const char* tesPath,
 				const char* gsPath, const char* fsPath)
 	{

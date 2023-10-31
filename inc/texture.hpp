@@ -4,5 +4,12 @@
 
 #include "stb_image.hpp"
 #include "glad/glad.h"
+#include <tuple>
 
-unsigned int loadTexture(const char* path);
+struct TexInfo{
+	unsigned int texID;
+	int width;
+	int height;
+};
+
+TexInfo loadTexture(const char* path);
