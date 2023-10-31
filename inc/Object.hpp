@@ -36,3 +36,21 @@ class LightSphere : public Object{
 	void draw(const Camera& camera) override;
 	void updatePosition() override;
 };
+
+class TessTerrain{
+public:
+	TessTerrain(){}
+	~TessTerrain(){}
+	TessTerrain(TexInfo, FullShader);
+
+	void draw();
+
+private:
+void setup();
+
+private:
+	TexInfo m_tex;
+	FullShader m_shader;
+	VAO m_vao;
+	unsigned int m_rez;
+};

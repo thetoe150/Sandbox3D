@@ -1,6 +1,6 @@
 #include "Texture.hpp"
 
-std::tuple<unsigned int, int, int> loadTexture(const char* path)
+TexInfo loadTexture(const char* path)
 {
 	stbi_set_flip_vertically_on_load(true);
 
@@ -39,5 +39,5 @@ std::tuple<unsigned int, int, int> loadTexture(const char* path)
 		stbi_image_free(data);	
 	}
 
-	return {texID, width, height};
+	return TexInfo{texID, width, height};
 }

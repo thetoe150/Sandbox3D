@@ -15,10 +15,13 @@ enum class SHADERS{
 	PHONG_1_LIGHT,
 	COLOR_LIGHT,
 	LIGHT_SOURCE,
+};
+extern std::unordered_map<SHADERS, Shader> ShaderCollection;
+
+enum class FULL_SHADERS{
 	TERRAIN
 };
-
-extern std::unordered_map<SHADERS, Shader*> ShaderCollection;
+extern std::unordered_map<FULL_SHADERS, FullShader> FullShaderCollection;
 
 enum class TEXTURES{
 	BOX_DIFF,
@@ -27,7 +30,9 @@ enum class TEXTURES{
 	BASKET_BALL,
 	SALUTE,
 	NERDING,
-	MOON
+	MOON,
+	TERRAIN
 };
 
 extern std::unordered_map<TEXTURES, unsigned int> TextureCollection;
+extern TexInfo terrainTexture;
