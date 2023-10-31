@@ -1,6 +1,6 @@
 #include "Texture.hpp"
 
-unsigned int loadTexture(const char* path)
+std::tuple<unsigned int, int, int> loadTexture(const char* path)
 {
 	stbi_set_flip_vertically_on_load(true);
 
@@ -35,9 +35,9 @@ unsigned int loadTexture(const char* path)
 	}
 	else
 	{
-		std::cout << "Texture failed to load at path" << path <<std::endl;
+		std::cout << "Texture failed to load at path" << path << std::endl;
 		stbi_image_free(data);	
 	}
 
-	return texID;
+	return {texID, width, height};
 }

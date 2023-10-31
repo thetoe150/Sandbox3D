@@ -25,7 +25,7 @@ $(EXE): $(OBJ_FILES) obj/glad.o
 obj/main.o: src/main.cpp inc/main.hpp $(HEADER_ONLY_FILES)
 	$(CC) -c $< -o $@ $(CFLAGS)
 
-obj/%.o: src/%.cpp inc/%.hpp
+obj/%.o: src/%.cpp inc/%.hpp $(HEADER_ONLY_FILES)
 	$(CC) -c $< -o $@ $(CFLAGS)
 
 obj/glad.o: src/glad.cpp inc/glad/glad.h
