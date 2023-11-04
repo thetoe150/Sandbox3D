@@ -4,7 +4,7 @@
 
 #include "stb_image.hpp"
 #include "glad/glad.h"
-#include <tuple>
+#include <array>
 
 struct TexInfo{
 	unsigned int texID;
@@ -13,3 +13,4 @@ struct TexInfo{
 };
 
 TexInfo loadTexture(const char* path);
+unsigned int loadCubeMap(std::array<const char*, 6>);

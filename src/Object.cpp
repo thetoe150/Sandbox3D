@@ -95,7 +95,7 @@ void Object::draw(const Camera& camera)
 
 	m_shader.setVec3("uSpotLight.position", camera.getPosition());
 	m_shader.setVec3("uSpotLight.direction", camera.getFront());
-	m_shader.setVec3("uPointLight.position", lightPositions);
+	m_shader.setVec3("uPointLight.position", g_lightPositions);
 
 	for(unsigned int i = 0; i < m_textures.size(); i++)
 	{
@@ -139,13 +139,13 @@ void Object::addCollision(std::unique_ptr<CollisionComponent>&& coll)
 // NOTE: this funciton respond for ePosition change and update r3Pos and r3Vel
 void Object::updatePosition()
 {
-	m_collision->ePosition = m_collision->ePosition + m_collision->eVelocity * deltaTime;
+	m_collision->ePosition = m_collision->ePosition + m_collision->eVelocity * g_deltaTime;
 	m_collision->updateR3spaceAccord();
 }
 void LightSphere::updatePosition()
 {
 	Object::updatePosition();
-	lightPositions = m_collision->r3Position;
+	g_lightPositions = m_collision->r3Position;
 }
 
 // NOTE: this funciton respond for eVelocity change
@@ -205,9 +205,9 @@ void Object::checkCollision(Object* targetObj, bool isDynamic)
 		// std::cout << "\np2 after elipsoid transform: " << glm::to_string(p2);
 		// std::cout << "\np3 after elipsoid transform: " << glm::to_string(p3);
 		if(!isDynamic)
-			checkTriangle(std::move(m_collision), p1, p2, p3, -nor, deltaTime);
+			checkTriangle(std::move(m_collision), p1, p2, p3, -nor, g_deltaTime);
 		else
-			checkTriangle(std::move(m_collision), p1, p2, p3, nor, deltaTime);
+			checkTriangle(std::move(m_collision), p1, p2, p3, nor, g_deltaTime);
 	}
 
 	if(m_collision->foundCollision)
@@ -298,9 +298,9 @@ void TessTerrain::draw()
 	m_shader.use();
 	glm::mat4 model = glm::mat4(1.0f);
 	m_shader.setMat4("uModel", model);
-	glm::mat4 view = camera.getLookAtMatrix();
+	glm::mat4 view = g_camera.getLookAtMatrix();
 	m_shader.setMat4("uView", view);
-	glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), 
+	glm::mat4 projection = glm::perspective(glm::radians(g_camera.getZoom()), 
 								(float) WINDOW_WIDTH / (float)WINDOW_HEIGHT,
 								0.1f, 1000.f);
 	m_shader.setMat4("uProjection", projection);
@@ -311,3 +311,34 @@ void TessTerrain::draw()
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 	glDrawArrays(GL_PATCHES, 0, 4 * m_rez * m_rez);
 }
+
+SkyBox::SkyBox(unsigned int boxTex, Shader shader)
+	: m_boxTex(boxTex), m_shader(shader)
+{
+	setup();
+}
+
+void SkyBox::setup()
+{
+	m_shader.use();
+	m_shader.setInt("skybox", 0);	
+	VAO temp(g_skyBoxVertices, g_skyBoxVerticesLength * sizeof(float), 3, 0, 0);
+	m_VAO = temp;
+}
+
+void SkyBox::draw()
+{
+	glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+	m_shader.use();
+	glm::mat4 view = glm::mat4(glm::mat3(g_camera.getLookAtMatrix())); // remove translation from the view matrix
+	glm::mat4 projection = glm::perspective(glm::radians(g_camera.getZoom()), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+	m_shader.setMat4("uView", view);
+	m_shader.setMat4("uProjection", projection);
+	// skybox cube
+	m_VAO.bind();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_boxTex);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glDepthFunc(GL_LESS); // set depth function back to default
+}
+

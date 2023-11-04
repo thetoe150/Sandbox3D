@@ -3,21 +3,21 @@
 const int WINDOW_HEIGHT = 800;
 const int WINDOW_WIDTH = 1200;
 
-float deltaTime = 0.f;
-float lastTime = 0.f;
+float g_deltaTime = 0.f;
+float g_lastTime = 0.f;
 
-Camera camera;
-glm::vec3 lightPositions;
+Camera g_camera;
+glm::vec3 g_lightPositions;
 
-const float triangle[] = {
+const float g_triangle[] = {
 	// positions          // color           // normal
 	-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 
 	 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 
 	 0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
 };
-const unsigned int triangleLength = sizeof(triangle) / sizeof(triangle[0]);
+const unsigned int g_triangleLength = sizeof(g_triangle) / sizeof(g_triangle[0]);
 
-const float textureBoxVertices[] = 
+const float g_textureBoxVertices[] = 
 {
 	// positions          // normals           // texture coords
 	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
@@ -62,11 +62,11 @@ const float textureBoxVertices[] =
 	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
 	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
 };
-const unsigned int textureBoxVerticesLength = sizeof(textureBoxVertices) / sizeof(textureBoxVertices[0]);
+const unsigned int g_textureBoxVerticesLength = sizeof(g_textureBoxVertices) / sizeof(g_textureBoxVertices[0]);
 
-const float colorBoxVertices[] = 
+const float g_colorBoxVertices[] = 
 {
-	// positions          // normals           // texture coords
+	// positions          // normals           // color
 	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
 	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f, 0.0f,
 	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f, 1.0f,
@@ -109,4 +109,53 @@ const float colorBoxVertices[] =
 	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
 	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f
 };
-const unsigned int colorBoxVerticesLength = sizeof(colorBoxVertices) / sizeof(colorBoxVertices[0]);
+
+const unsigned int g_colorBoxVerticesLength = sizeof(g_colorBoxVertices) / sizeof(g_colorBoxVertices[0]);
+
+const float g_skyBoxVertices[] = 
+{
+	// positions          
+	-1.0f,  1.0f, -1.0f,
+	-1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+	 1.0f,  1.0f, -1.0f,
+	-1.0f,  1.0f, -1.0f,
+
+	-1.0f, -1.0f,  1.0f,
+	-1.0f, -1.0f, -1.0f,
+	-1.0f,  1.0f, -1.0f,
+	-1.0f,  1.0f, -1.0f,
+	-1.0f,  1.0f,  1.0f,
+	-1.0f, -1.0f,  1.0f,
+
+	 1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+
+	-1.0f, -1.0f,  1.0f,
+	-1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f, -1.0f,  1.0f,
+	-1.0f, -1.0f,  1.0f,
+
+	-1.0f,  1.0f, -1.0f,
+	 1.0f,  1.0f, -1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	-1.0f,  1.0f,  1.0f,
+	-1.0f,  1.0f, -1.0f,
+
+	-1.0f, -1.0f, -1.0f,
+	-1.0f, -1.0f,  1.0f,
+	 1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+	-1.0f, -1.0f,  1.0f,
+	 1.0f, -1.0f,  1.0f
+};
+
+const unsigned int g_skyBoxVerticesLength = sizeof(g_skyBoxVertices) / sizeof(g_skyBoxVertices[0]);
