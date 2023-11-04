@@ -291,7 +291,7 @@ void TessTerrain::setup()
     std::cout << "Processing " << m_rez * m_rez * 4 << " vertices in vertex shader" << std::endl;
 
 	VAO temp(vertices.data(), sizeof(float) * vertices.size(), 3, 2, 0);
-	m_vao = temp;
+	m_vao = std::move(temp);
 }
 void TessTerrain::draw()
 {
@@ -323,7 +323,7 @@ void SkyBox::setup()
 	m_shader.use();
 	m_shader.setInt("skybox", 0);	
 	VAO temp(g_skyBoxVertices, g_skyBoxVerticesLength * sizeof(float), 3, 0, 0);
-	m_VAO = temp;
+	m_VAO = std::move(temp);
 }
 
 void SkyBox::draw()
