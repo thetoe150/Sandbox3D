@@ -66,8 +66,8 @@ void LoadAllTexture()
 	{
 		"D:/PP/Sandbox/res/skybox/right.jpg",
 		"D:/PP/Sandbox/res/skybox/left.jpg",
-		"D:/PP/Sandbox/res/skybox/bottom.jpg",
 		"D:/PP/Sandbox/res/skybox/top.jpg",
+		"D:/PP/Sandbox/res/skybox/bottom.jpg",
 		"D:/PP/Sandbox/res/skybox/front.jpg",
 		"D:/PP/Sandbox/res/skybox/back.jpg"
 	};

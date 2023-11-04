@@ -41,6 +41,8 @@ TexInfo loadTexture(const char* path)
 
 unsigned int loadCubeMap(std::array<const char*, 6> paths)
 {
+	stbi_set_flip_vertically_on_load(false);
+
 	unsigned int cubeMapID;
 	glGenTextures(1, &cubeMapID);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapID);
