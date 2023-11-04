@@ -46,11 +46,28 @@ public:
 	void draw();
 
 private:
-void setup();
+	void setup();
 
 private:
 	TexInfo m_tex;
 	FullShader m_shader;
 	VAO m_vao;
 	unsigned int m_rez;
+};
+
+class SkyBox{
+public:
+	SkyBox(){}
+	~SkyBox(){}
+	SkyBox(unsigned int, Shader);
+
+	void draw();
+
+private:
+	void setup();	
+
+private:
+	unsigned int m_boxTex;
+	Shader m_shader;
+	VAO m_VAO;
 };

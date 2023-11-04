@@ -11,6 +11,7 @@ std::vector<Object*> StaticObjects;
 std::vector<Object*> DynamicObjects;
 std::vector<Object*> LightObjects;
 TessTerrain* terrain;
+SkyBox* skybox;
 
 static void createBall();
 float LinearInterpolate(float x, float x_min, float x_max, float a, float b);
@@ -134,6 +135,7 @@ void CreateObject()
 	StaticObjects.push_back(cylinderObj);
 
 	terrain = new TessTerrain(terrainTexture, FullShaderCollection[FULL_SHADERS::TERRAIN]);
+	skybox = new SkyBox(skyBoxTexture, ShaderCollection[SHADERS::SKY_BOX]);
 }
 
 void ProcessInput(GLFWwindow* window)
@@ -156,17 +158,17 @@ void ProcessInput(GLFWwindow* window)
 
     //// key for camera
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.processKeyboard(CameraMovement::FORWARD, deltaTime);
+        g_camera.processKeyboard(CameraMovement::FORWARD, g_deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.processKeyboard(CameraMovement::BACKWARD, deltaTime);
+        g_camera.processKeyboard(CameraMovement::BACKWARD, g_deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.processKeyboard(CameraMovement::LEFT, deltaTime);
+        g_camera.processKeyboard(CameraMovement::LEFT, g_deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.processKeyboard(CameraMovement::RIGHT, deltaTime);
+        g_camera.processKeyboard(CameraMovement::RIGHT, g_deltaTime);
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        camera.processKeyboard(CameraMovement::UP, deltaTime);
+        g_camera.processKeyboard(CameraMovement::UP, g_deltaTime);
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        camera.processKeyboard(CameraMovement::DOWN, deltaTime);
+        g_camera.processKeyboard(CameraMovement::DOWN, g_deltaTime);
 
     // key for switch wireframe mode
     if(glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
@@ -190,12 +192,12 @@ void ProcessInput(GLFWwindow* window)
 void Update()
 {
 	float currentTime = static_cast<float>(glfwGetTime());
-	deltaTime = currentTime - lastTime;
-	lastTime = currentTime;
+	g_deltaTime = currentTime - g_lastTime;
+	g_lastTime = currentTime;
 
 	if(speedCount > 30)
 	{
-		std::cout << "FPS: " << 1 / deltaTime << std::endl;
+		std::cout << "FPS: " << 1 / g_deltaTime << std::endl;
 		speedCount = 0;
 	}
 	speedCount += 1;
@@ -233,22 +235,23 @@ void Render(GLFWwindow* window)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	terrain->draw();
+	skybox->draw();
 
 	for(const auto& o : LightObjects)
 	{
-		o->draw(camera);
+		o->draw(g_camera);
 	}
 
 	for(const auto& o : StaticObjects)
 	{
-		o->draw(camera);
+		o->draw(g_camera);
 	}
 
 	for(const auto& o : DynamicObjects)
 	{
-		o->draw(camera);
+		o->draw(g_camera);
 	}
-	
+
 	//modelShader.setMat4("model", model);
 	//backpack.draw(modelShader);
 
@@ -283,14 +286,14 @@ static void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     lastX = xpos;
     lastY = ypos;
 
-    camera.processMouseMovement(xoffset, yoffset);
+    g_camera.processMouseMovement(xoffset, yoffset);
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ----------------------------------------------------------------------------
 static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    camera.processMouseScroll(static_cast<float>(yoffset));
+    g_camera.processMouseScroll(static_cast<float>(yoffset));
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -425,3 +428,4 @@ float LinearInterpolate(float x, float x_min, float x_max, float a, float b)
 	float ratio = (b - a) / (x_max - x_min);
 	return a + (x - x_min) * ratio;
 }
+

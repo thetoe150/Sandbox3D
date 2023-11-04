@@ -8,17 +8,19 @@
 extern const int WINDOW_HEIGHT;
 extern const int WINDOW_WIDTH;
 
-extern const float triangle[];
-extern const unsigned int triangleLength;
-extern const float colorBoxVertices[];
-extern const unsigned int colorBoxVerticesLength;
-extern const float textureBoxVertices[];
-extern const unsigned int textureBoxVerticesLength;
+extern const float g_triangle[];
+extern const unsigned int g_triangleLength;
+extern const float g_colorBoxVertices[];
+extern const unsigned int g_colorBoxVerticesLength;
+extern const float g_textureBoxVertices[];
+extern const unsigned int g_textureBoxVerticesLength;
+extern const float g_skyBoxVertices[];
+extern const unsigned int g_skyBoxVerticesLength;
 
 // Variables 
 // --------------------------------------------------------------------------------
-extern float deltaTime;
-extern float lastTime;
+extern float g_deltaTime;
+extern float g_lastTime;
 
-extern Camera camera;
-extern glm::vec3 lightPositions;
+extern Camera g_camera;
+extern glm::vec3 g_lightPositions;

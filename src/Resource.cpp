@@ -4,6 +4,7 @@ std::unordered_map<SHADERS, Shader> ShaderCollection{0};
 std::unordered_map<FULL_SHADERS, FullShader> FullShaderCollection{0};
 std::unordered_map<TEXTURES, unsigned int> TextureCollection{0};
 TexInfo terrainTexture;
+unsigned int skyBoxTexture;
 
 void LoadAllShader()
 {
@@ -13,6 +14,8 @@ void LoadAllShader()
 									  "D:/PP/Sandbox/src/shader/texture_phong_fs.glsl");
 	Shader lightSrcShader("D:/PP/Sandbox/src/shader/light_source_vs.glsl", 
 									  "D:/PP/Sandbox/src/shader/light_source_fs.glsl");
+	Shader skyboxShader("D:/PP/Sandbox/src/shader/skybox_vs.glsl", 
+									  "D:/PP/Sandbox/src/shader/skybox_fs.glsl");
 
 	// Shader* terrainShader = new FullShader("D:/PP/Sandbox/src/shader/terrain_vs.glsl",
 	// 						"D:/PP/Sandbox/src/shader/terrain_tcs.glsl",
@@ -23,6 +26,7 @@ void LoadAllShader()
 	ShaderCollection[SHADERS::PHONG_3_LIGHT] = textureShader;
 	ShaderCollection[SHADERS::COLOR_LIGHT] = colorShader;
 	ShaderCollection[SHADERS::LIGHT_SOURCE] = lightSrcShader;
+	ShaderCollection[SHADERS::SKY_BOX] = skyboxShader;
 
 	
 	// Terrain
@@ -57,5 +61,15 @@ void LoadAllTexture()
 	TextureCollection[TEXTURES::TERRAIN] = terrainTex;
 
 	terrainTexture = loadTexture("D:/PP/Sandbox/res/iceland_heightmap.png");
-}
 
+	std::array<const char*, 6> skyBoxTex =
+	{
+		"D:/PP/Sandbox/res/skybox/right.jpg",
+		"D:/PP/Sandbox/res/skybox/left.jpg",
+		"D:/PP/Sandbox/res/skybox/bottom.jpg",
+		"D:/PP/Sandbox/res/skybox/top.jpg",
+		"D:/PP/Sandbox/res/skybox/front.jpg",
+		"D:/PP/Sandbox/res/skybox/back.jpg"
+	};
+	skyBoxTexture = loadCubeMap(skyBoxTex);
+}
