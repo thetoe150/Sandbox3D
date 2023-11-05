@@ -35,8 +35,8 @@ enum class TEXTURES{
 	TERRAIN
 };
 
-extern std::unordered_map<SHADERS, Shader> ShaderCollection;
-extern std::unordered_map<FULL_SHADERS, FullShader> FullShaderCollection;
-extern std::unordered_map<TEXTURES, unsigned int> TextureCollection;
-extern TexInfo terrainTexture;
-extern unsigned int skyBoxTexture;
+extern std::unordered_map<SHADERS, Shader> g_shaderCollection;
+extern std::unordered_map<FULL_SHADERS, FullShader> g_fullShaderCollection;
+extern std::unordered_map<TEXTURES, unsigned int> g_textureCollection;
+extern TexInfo g_terrainTexture;
+extern unsigned int g_skyBoxTexture;

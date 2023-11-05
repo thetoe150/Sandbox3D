@@ -135,11 +135,11 @@ void CreateObject()
 	cylinderObj->addCollision(std::move(nullColl));
 	StaticObjects.push_back(cylinderObj);
 
-	terrain = new TessTerrain(terrainTexture, FullShaderCollection[FULL_SHADERS::TERRAIN]);
-	skybox = new SkyBox(skyBoxTexture, ShaderCollection[SHADERS::SKY_BOX]);
+	terrain = new TessTerrain(g_terrainTexture, g_fullShaderCollection[FULL_SHADERS::TERRAIN]);
+	skybox = new SkyBox(g_skyBoxTexture, g_shaderCollection[SHADERS::SKY_BOX]);
 
 	VAO reflect(g_textureBoxVertices, g_textureBoxVerticesLength * sizeof(float), 3, 3, 2);
-	reflectCube = new ReflectCube(std::move(reflect), ShaderCollection[SHADERS::REFLECT_SKYBOX], skyBoxTexture);
+	reflectCube = new ReflectCube(std::move(reflect), g_shaderCollection[SHADERS::REFLECT_SKYBOX], g_skyBoxTexture);
 }
 
 void ProcessInput(GLFWwindow* window)
