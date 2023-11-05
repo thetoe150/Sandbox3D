@@ -12,6 +12,7 @@ std::vector<Object*> DynamicObjects;
 std::vector<Object*> LightObjects;
 TessTerrain* terrain;
 SkyBox* skybox;
+ReflectCube* reflectCube;
 
 static void createBall();
 float LinearInterpolate(float x, float x_min, float x_max, float a, float b);
@@ -136,6 +137,9 @@ void CreateObject()
 
 	terrain = new TessTerrain(terrainTexture, FullShaderCollection[FULL_SHADERS::TERRAIN]);
 	skybox = new SkyBox(skyBoxTexture, ShaderCollection[SHADERS::SKY_BOX]);
+
+	VAO reflect(g_textureBoxVertices, g_textureBoxVerticesLength * sizeof(float), 3, 3, 2);
+	reflectCube = new ReflectCube(std::move(reflect), ShaderCollection[SHADERS::REFLECT_SKYBOX], skyBoxTexture);
 }
 
 void ProcessInput(GLFWwindow* window)
@@ -236,6 +240,7 @@ void Render(GLFWwindow* window)
 
 	terrain->draw();
 	skybox->draw();
+	reflectCube->draw();
 
 	for(const auto& o : LightObjects)
 	{
@@ -353,7 +358,6 @@ static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, 
     std::cout << std::endl;
 }
 #endif //DEBUG
-
 
 static void createBall()
 {
