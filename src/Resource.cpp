@@ -16,6 +16,10 @@ void LoadAllShader()
 									  "D:/PP/Sandbox/src/shader/light_source_fs.glsl");
 	Shader skyboxShader("D:/PP/Sandbox/src/shader/skybox_vs.glsl", 
 									  "D:/PP/Sandbox/src/shader/skybox_fs.glsl");
+	Shader reflect("D:/PP/Sandbox/src/shader/reflect_skybox_vs.glsl", 
+									  "D:/PP/Sandbox/src/shader/reflect_skybox_fs.glsl");
+	Shader refract("D:/PP/Sandbox/src/shader/refract_skybox_vs.glsl", 
+									  "D:/PP/Sandbox/src/shader/refract_skybox_fs.glsl");
 
 	// Shader* terrainShader = new FullShader("D:/PP/Sandbox/src/shader/terrain_vs.glsl",
 	// 						"D:/PP/Sandbox/src/shader/terrain_tcs.glsl",
@@ -27,6 +31,8 @@ void LoadAllShader()
 	ShaderCollection[SHADERS::COLOR_LIGHT] = colorShader;
 	ShaderCollection[SHADERS::LIGHT_SOURCE] = lightSrcShader;
 	ShaderCollection[SHADERS::SKY_BOX] = skyboxShader;
+	ShaderCollection[SHADERS::REFLECT_SKYBOX] = reflect;
+	ShaderCollection[SHADERS::REFRACT_SKYBOX] = refract;
 
 	
 	// Terrain

@@ -71,3 +71,19 @@ private:
 	Shader m_shader;
 	VAO m_VAO;
 };
+
+class ReflectCube{
+public:
+	ReflectCube(){}
+	~ReflectCube(){}
+	ReflectCube(VAO&&, Shader, unsigned int);
+
+	void draw();
+private:
+	void setup();
+
+private:
+	VAO m_VAO;
+	Shader m_shader;
+	unsigned int m_boxTex;
+};

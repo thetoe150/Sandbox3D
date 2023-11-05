@@ -342,3 +342,36 @@ void SkyBox::draw()
 	glDepthFunc(GL_LESS); // set depth function back to default
 }
 
+ReflectCube::ReflectCube(VAO&& vao, Shader shader, unsigned int tex)
+			: m_VAO(std::move(vao)), m_shader(shader),m_boxTex(tex) 
+{
+	setup();
+}
+
+void ReflectCube::setup()
+{
+	m_shader.use();	
+	m_shader.setInt("skybox", 0);
+}
+
+void ReflectCube::draw()
+{
+	m_shader.use();
+	glm::mat4 model(1.0f);
+	model = glm::translate(model, glm::vec3(1.0f, 4.0f, 3.0f));
+	// uModel = glm::rotate(uModel, glm::radians(45.f), glm::vec3(1.0f));
+	// uModel = glm::scale(uModel, glm::vec3(1.0f));
+	
+	glm::mat4 view = g_camera.getLookAtMatrix();
+	glm::mat4 proj = glm::perspective(glm::radians(g_camera.getZoom()), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+	m_shader.setMat4("uModel", model);
+	m_shader.setMat4("uView", view);
+	m_shader.setMat4("uProjection", proj);
+
+	m_shader.setVec3("cameraPos", g_camera.getPosition());
+
+	m_VAO.bind();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_boxTex);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+}
