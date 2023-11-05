@@ -23,22 +23,22 @@ LightSphereFactory::LightSphereFactory()
 
 Shader ObjectFactory::makeShader()
 {
-	return ShaderCollection[SHADERS::PHONG_3_LIGHT];
+	return g_shaderCollection[SHADERS::PHONG_3_LIGHT];
 };
 
 Shader SphereFactory::makeShader()
 {
-	return ShaderCollection[SHADERS::PHONG_3_LIGHT];
+	return g_shaderCollection[SHADERS::PHONG_3_LIGHT];
 };
 
 Shader CylinderFactory::makeShader()
 {
-	return ShaderCollection[SHADERS::PHONG_3_LIGHT];
+	return g_shaderCollection[SHADERS::PHONG_3_LIGHT];
 };
 
 Shader LightSphereFactory::makeShader()
 {
-	return ShaderCollection[SHADERS::LIGHT_SOURCE];
+	return g_shaderCollection[SHADERS::LIGHT_SOURCE];
 }
 
 // make texture
@@ -49,33 +49,33 @@ std::vector<unsigned int> ObjectFactory::makeTexture(TEXTURES t)
 	std::vector<unsigned int> res;
 	if(t == TEXTURES::BOX_DIFF)
 	{
-		res.push_back(TextureCollection[TEXTURES::BOX_DIFF]);
-		res.push_back(TextureCollection[TEXTURES::BOX_SPEC]);
-		res.push_back(TextureCollection[TEXTURES::BOX_EMIT]);
+		res.push_back(g_textureCollection[TEXTURES::BOX_DIFF]);
+		res.push_back(g_textureCollection[TEXTURES::BOX_SPEC]);
+		res.push_back(g_textureCollection[TEXTURES::BOX_EMIT]);
 	}
 	else if(t == TEXTURES::SALUTE)
 	{
-		res.push_back(TextureCollection[TEXTURES::SALUTE]);
-		res.push_back(TextureCollection[TEXTURES::BOX_SPEC]);
-		res.push_back(TextureCollection[TEXTURES::BOX_EMIT]);
+		res.push_back(g_textureCollection[TEXTURES::SALUTE]);
+		res.push_back(g_textureCollection[TEXTURES::BOX_SPEC]);
+		res.push_back(g_textureCollection[TEXTURES::BOX_EMIT]);
 	}
 	else if(t == TEXTURES::NERDING)
 	{
-		res.push_back(TextureCollection[TEXTURES::NERDING]);
-		res.push_back(TextureCollection[TEXTURES::BOX_SPEC]);
-		res.push_back(TextureCollection[TEXTURES::BOX_EMIT]);
+		res.push_back(g_textureCollection[TEXTURES::NERDING]);
+		res.push_back(g_textureCollection[TEXTURES::BOX_SPEC]);
+		res.push_back(g_textureCollection[TEXTURES::BOX_EMIT]);
 	}
 	else if(t == TEXTURES::MOON)
 	{
-		res.push_back(TextureCollection[TEXTURES::MOON]);
-		res.push_back(TextureCollection[TEXTURES::BOX_SPEC]);
-		res.push_back(TextureCollection[TEXTURES::BOX_EMIT]);
+		res.push_back(g_textureCollection[TEXTURES::MOON]);
+		res.push_back(g_textureCollection[TEXTURES::BOX_SPEC]);
+		res.push_back(g_textureCollection[TEXTURES::BOX_EMIT]);
 	}
 	else
 	{
-		res.push_back(TextureCollection[TEXTURES::BASKET_BALL]);
-		res.push_back(TextureCollection[TEXTURES::BOX_SPEC]);
-		res.push_back(TextureCollection[TEXTURES::BOX_EMIT]);
+		res.push_back(g_textureCollection[TEXTURES::BASKET_BALL]);
+		res.push_back(g_textureCollection[TEXTURES::BOX_SPEC]);
+		res.push_back(g_textureCollection[TEXTURES::BOX_EMIT]);
 	}
 	return res;
 };

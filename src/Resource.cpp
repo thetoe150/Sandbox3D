@@ -1,10 +1,10 @@
 #include "Resource.hpp"
 
-std::unordered_map<SHADERS, Shader> ShaderCollection{0};
-std::unordered_map<FULL_SHADERS, FullShader> FullShaderCollection{0};
-std::unordered_map<TEXTURES, unsigned int> TextureCollection{0};
-TexInfo terrainTexture;
-unsigned int skyBoxTexture;
+std::unordered_map<SHADERS, Shader> g_shaderCollection{0};
+std::unordered_map<FULL_SHADERS, FullShader> g_fullShaderCollection{0};
+std::unordered_map<TEXTURES, unsigned int> g_textureCollection{0};
+TexInfo g_terrainTexture;
+unsigned int g_skyBoxTexture;
 
 void LoadAllShader()
 {
@@ -27,12 +27,12 @@ void LoadAllShader()
 	// 						 nullptr,
 	// 						"D:/PP/Sandbox/src/shader/terrain_fs.glsl");
 
-	ShaderCollection[SHADERS::PHONG_3_LIGHT] = textureShader;
-	ShaderCollection[SHADERS::COLOR_LIGHT] = colorShader;
-	ShaderCollection[SHADERS::LIGHT_SOURCE] = lightSrcShader;
-	ShaderCollection[SHADERS::SKY_BOX] = skyboxShader;
-	ShaderCollection[SHADERS::REFLECT_SKYBOX] = reflect;
-	ShaderCollection[SHADERS::REFRACT_SKYBOX] = refract;
+	g_shaderCollection[SHADERS::PHONG_3_LIGHT] = textureShader;
+	g_shaderCollection[SHADERS::COLOR_LIGHT] = colorShader;
+	g_shaderCollection[SHADERS::LIGHT_SOURCE] = lightSrcShader;
+	g_shaderCollection[SHADERS::SKY_BOX] = skyboxShader;
+	g_shaderCollection[SHADERS::REFLECT_SKYBOX] = reflect;
+	g_shaderCollection[SHADERS::REFRACT_SKYBOX] = refract;
 
 	
 	// Terrain
@@ -43,7 +43,7 @@ void LoadAllShader()
 							 nullptr,
 							"D:/PP/Sandbox/src/shader/terrain_fs.glsl");
 
-	FullShaderCollection[FULL_SHADERS::TERRAIN] = terrainShader;
+	g_fullShaderCollection[FULL_SHADERS::TERRAIN] = terrainShader;
 }
 
 void LoadAllTexture()
@@ -57,16 +57,16 @@ void LoadAllTexture()
 	unsigned int moonTex = loadTexture("D:/PP/Sandbox/res/moon.png").texID;
 	unsigned int terrainTex = loadTexture("D:/PP/Sandbox/res/iceland_heightmap.png").texID;
 
-	TextureCollection[TEXTURES::BOX_DIFF] = boxDiffTex;
-	TextureCollection[TEXTURES::BOX_SPEC] = boxSpecTex;
-	TextureCollection[TEXTURES::BOX_EMIT] = boxEmitTex;
-	TextureCollection[TEXTURES::BASKET_BALL] = basketTex;
-	TextureCollection[TEXTURES::SALUTE] = saluteTex;
-	TextureCollection[TEXTURES::NERDING] = nerdTex;
-	TextureCollection[TEXTURES::MOON] = moonTex;
-	TextureCollection[TEXTURES::TERRAIN] = terrainTex;
+	g_textureCollection[TEXTURES::BOX_DIFF] = boxDiffTex;
+	g_textureCollection[TEXTURES::BOX_SPEC] = boxSpecTex;
+	g_textureCollection[TEXTURES::BOX_EMIT] = boxEmitTex;
+	g_textureCollection[TEXTURES::BASKET_BALL] = basketTex;
+	g_textureCollection[TEXTURES::SALUTE] = saluteTex;
+	g_textureCollection[TEXTURES::NERDING] = nerdTex;
+	g_textureCollection[TEXTURES::MOON] = moonTex;
+	g_textureCollection[TEXTURES::TERRAIN] = terrainTex;
 
-	terrainTexture = loadTexture("D:/PP/Sandbox/res/iceland_heightmap.png");
+	g_terrainTexture = loadTexture("D:/PP/Sandbox/res/iceland_heightmap.png");
 
 	std::array<const char*, 6> skyBoxTex =
 	{
@@ -77,5 +77,5 @@ void LoadAllTexture()
 		"D:/PP/Sandbox/res/skybox/front.jpg",
 		"D:/PP/Sandbox/res/skybox/back.jpg"
 	};
-	skyBoxTexture = loadCubeMap(skyBoxTex);
+	g_skyBoxTexture = loadCubeMap(skyBoxTex);
 }
