@@ -1,6 +1,8 @@
 #include "Application.hpp"
 #include "Object.hpp"
 #include "ObjectFactory.hpp"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
 
 bool firstMouse = true;
 float lastX = 0.f;
@@ -85,6 +87,18 @@ GLFWwindow* SetupContext()
 	// glCullFace(GL_FRONT);	
 	// default front face has counter clock-wise vertices, set this to change to clock-wise
 	// glCullFace(GL_CW);
+	//
+
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+	// Setup Platform/Renderer backends
+	ImGui_ImplGlfw_InitForOpenGL(window, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+	ImGui_ImplOpenGL3_Init();
 
 	return window;
 };
@@ -238,6 +252,11 @@ void Render(GLFWwindow* window)
 	glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+	ImGui::ShowDemoWindow();
+
 	terrain->draw();
 	skybox->draw();
 	reflectCube->draw();
@@ -259,10 +278,22 @@ void Render(GLFWwindow* window)
 
 	//modelShader.setMat4("model", model);
 	//backpack.draw(modelShader);
+	//
+	
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();
 
+}
+
+void Terminate()
+{
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+
+	glfwTerminate();
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

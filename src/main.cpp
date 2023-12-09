@@ -23,6 +23,7 @@ int main()
 		Render(window);
 	}
 
-	glfwTerminate();
+	Terminate();
+
 	return 0;
 }

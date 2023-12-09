@@ -19,6 +19,7 @@ void CreateObject();
 void ProcessInput(GLFWwindow* window);
 void Update();
 void Render(GLFWwindow* window);
+void Terminate();
 
 static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
