@@ -1,4 +1,5 @@
 #include "main.hpp"
+#include "Tracy.hpp"
 
 int main()
 {
@@ -21,6 +22,7 @@ int main()
 		ProcessInput(window);
 		Update();
 		Render(window);
+		FrameMark;
 	}
 
 	Terminate();
