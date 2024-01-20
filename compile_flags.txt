@@ -1,4 +1,6 @@
 -Iinc
 -Iinc/GLFW
 -Iinc/glad
+-Iinc/imgui
+-Itracy/public/tracy
 -std=c++17

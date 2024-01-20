@@ -3,6 +3,7 @@
 #include "ObjectFactory.hpp"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
+#include "Tracy.hpp"
 
 bool firstMouse = true;
 float lastX = 0.f;
@@ -209,6 +210,7 @@ void ProcessInput(GLFWwindow* window)
 
 void Update()
 {
+	ZoneScopedN("Update");
 	float currentTime = static_cast<float>(glfwGetTime());
 	g_deltaTime = currentTime - g_lastTime;
 	g_lastTime = currentTime;
@@ -249,6 +251,7 @@ void Update()
 
 void Render(GLFWwindow* window)
 {
+	ZoneScopedN("Render");
 	glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -257,33 +260,52 @@ void Render(GLFWwindow* window)
 	ImGui::NewFrame();
 	ImGui::ShowDemoWindow();
 
-	terrain->draw();
-	skybox->draw();
-	reflectCube->draw();
-
-	for(const auto& o : LightObjects)
 	{
-		o->draw(g_camera);
+		ZoneScopedN("Terrain");
+		terrain->draw();
+		skybox->draw();
+		reflectCube->draw();
+		//glFinish();
 	}
 
-	for(const auto& o : StaticObjects)
 	{
-		o->draw(g_camera);
-	}
+		ZoneScopedN("Object");
+		for(const auto& o : LightObjects)
+		{
+			ZoneScopedN("Light");
+			o->draw(g_camera);
+		}
 
-	for(const auto& o : DynamicObjects)
-	{
-		o->draw(g_camera);
+		for(const auto& o : StaticObjects)
+		{
+			ZoneScopedN("Static");
+			o->draw(g_camera);
+		}
+
+		for(const auto& o : DynamicObjects)
+		{
+			ZoneScopedN("Dynamic");
+			o->draw(g_camera);
+		}
+		//glFinish();
 	}
 
 	//modelShader.setMat4("model", model);
 	//backpack.draw(modelShader);
 	//
 	
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	{
+		ZoneScopedN("ImGui");
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		//glFinish();
+	}
 
-	glfwSwapBuffers(window);
+	{
+		ZoneScopedN("Swap buffer");
+		glfwSwapBuffers(window);
+		//glFinish();
+	}
 	glfwPollEvents();
 
 }
